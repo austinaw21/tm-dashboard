@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TM Dashboard</title>
+<style>
+  :root {
+    --bg:#0a0e17;--surface:#111827;--surfAlt:#1a2235;--border:#1e293b;
+    --text:#e2e8f0;--dim:#94a3b8;--muted:#64748b;
+    --green:#22c55e;--greenBg:rgba(34,197,94,.1);--greenBd:rgba(34,197,94,.25);
+    --amber:#f59e0b;--amberBg:rgba(245,158,11,.1);--amberBd:rgba(245,158,11,.25);
+    --red:#ef4444;--redBg:rgba(239,68,68,.1);--redBd:rgba(239,68,68,.25);
+    --blue:#3b82f6;--blueBg:rgba(59,130,246,.08);--accent:#38bdf8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono','SF Mono','Fira Code','Courier New',monospace;
+    max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:60px;font-size:13px}
+  .header{padding:12px 16px 8px;display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
+  .header .title{font-size:15px;font-weight:700}
+  .header .title span:first-child{color:var(--accent)}
+  .hdr-right{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--surfAlt);border:1px solid var(--border);border-radius:6px;padding:4px 10px;
+    color:var(--dim);font-size:11px;cursor:pointer;font-family:inherit}
+  .btn:hover{border-color:var(--muted)}
+  .btn-x{background:transparent;border:none;color:var(--muted);font-size:11px;cursor:pointer}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px}
+  .badge-green{color:var(--green);background:var(--greenBg);border:1px solid var(--greenBd)}
+  .badge-amber{color:var(--amber);background:var(--amberBg);border:1px solid var(--amberBd)}
+  .badge-red{color:var(--red);background:var(--redBg);border:1px solid var(--redBd)}
+  .badge-blue{color:var(--blue);background:var(--blueBg);border:1px solid transparent}
+  .badge-muted{color:var(--muted);background:var(--surfAlt);border:1px solid var(--border)}
+  .row{display:flex;gap:8px}
+  .stat{flex:1;text-align:center}
+  .stat-label{font-size:11px;color:var(--muted);margin-bottom:2px}
+  .stat-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+  .stat-val .unit{font-size:11px;font-weight:400;color:var(--muted)}
+  .c-green{color:var(--green)}.c-amber{color:var(--amber)}.c-red{color:var(--red)}
+  .c-dim{color:var(--dim)}.c-muted{color:var(--muted)}.c-text{color:var(--text)}
+  .minibar{height:4px;border-radius:2px;background:var(--surfAlt);overflow:hidden;margin-top:4px}
+  .minibar-fill{height:100%;border-radius:2px;transition:width .5s}
+  .tab-bar{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--surface);
+    border-top:1px solid var(--border);z-index:10;max-width:480px;margin:0 auto}
+  .tab-btn{flex:1;padding:10px 0 8px;border:none;cursor:pointer;background:transparent;
+    font-size:12px;color:var(--muted);font-family:inherit;border-top:2px solid transparent}
+  .tab-btn.active{font-weight:700;color:var(--accent);border-top-color:var(--accent)}
+  .content{padding:10px 12px}
+  .err-banner{margin:8px 12px;padding:10px 14px;border-radius:8px;background:var(--redBg);
+    border:1px solid var(--redBd);font-size:12px;color:var(--red)}
+  .err-banner .msg{color:var(--dim);font-size:11px;margin-top:4px}
+  .period-toggle{padding:8px 16px 0;display:flex;gap:6px}
+  .period-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;
+    border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit}
+  .period-btn.active{border-color:var(--blue);background:var(--blueBg);color:var(--blue)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{padding:4px 6px;text-align:left;font-weight:500;color:var(--muted);border-bottom:1px solid var(--border)}
+  td{padding:4px 6px}
+  .setup{padding:20px;max-width:400px;margin:60px auto;text-align:center}
+  .setup h1{font-size:22px;margin-bottom:8px}
+  .setup p{font-size:13px;color:var(--dim);margin-bottom:24px}
+  .setup input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);
+    background:var(--surfAlt);color:var(--text);font-size:14px;outline:none;margin-bottom:12px;font-family:inherit}
+  .setup .connect{width:100%;padding:10px 0;border-radius:8px;border:none;background:var(--blue);
+    color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .sep{border-top:1px solid var(--border);padding-top:8px;margin-top:4px}
+  .pair-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+  .pair-row+.pair-row{border-top:1px solid var(--border)}
+  .rule-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+  .rule-row+.rule-row{border-top:1px solid rgba(30,41,59,.3)}
+  .flex-wrap{display:flex;gap:6px;flex-wrap:wrap}
+  .loading-dots::after{content:'';animation:dots 1.5s infinite}
+  @keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+  svg{display:block;margin:8px auto 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// State
+// ══════════════════════════════════════════════════════════════
+let state = {
+  url: localStorage.getItem("tm_dash_url") || "",
+  tab: "live",
+  period: "all",
+  data: null,
+  loading: false,
+  lastRefresh: null,
+  error: null
+};
+
+function setState(patch) {
+  Object.assign(state, patch);
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// Data fetching — direct fetch, works in any normal browser
+// ══════════════════════════════════════════════════════════════
+async function fetchData() {
+  if (!state.url) return;
+  if (state.url === "DEMO") {
+    setState({ data: getDemoData(), lastRefresh: new Date(), error: null, loading: false });
+    return;
+  }
+  setState({ loading: true, error: null });
+  try {
+    const res = await fetch(state.url + "?action=full&days=90");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    if (json.status === "ok") {
+      setState({ data: json, lastRefresh: new Date(), error: null, loading: false });
+    } else {
+      setState({ error: json.msg || "Unknown error", loading: false });
+    }
+  } catch (e) {
+    setState({ error: e.message + " — Check your Apps Script URL and that it's deployed as 'Anyone'", loading: false });
+  }
+}
+
+function connect(url) {
+  localStorage.setItem("tm_dash_url", url);
+  setState({ url });
+  fetchData();
+}
+
+function disconnect() {
+  localStorage.removeItem("tm_dash_url");
+  setState({ url: "", data: null, error: null, lastRefresh: null });
+}
+
+// ══════════════════════════════════════════════════════════════
+// Helpers
+// ══════════════════════════════════════════════════════════════
+const h = (tag, attrs, ...children) => {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === "className") el.className = v;
+    else if (k === "innerHTML") el.innerHTML = v;
+    else el.setAttribute(k, v);
+  });
+  children.flat(9).forEach(c => { if (c != null) el.append(typeof c === "string" ? c : c); });
+  return el;
+};
+
+function badge(text, type) {
+  return h("span", { className: "badge badge-" + type }, text);
+}
+
+function statusType(s) { return s === "RED" ? "red" : s === "HIGH" ? "amber" : "green"; }
+function ddType(dd) { return dd >= 15 ? "red" : dd >= 10 ? "amber" : "green"; }
+function pnlClass(v) { return v > 0 ? "c-green" : v < 0 ? "c-red" : "c-dim"; }
+
+function stat(label, value, colorClass) {
+  return h("div", { className: "stat" },
+    h("div", { className: "stat-label" }, label),
+    h("div", { className: "stat-val " + (colorClass || "c-text") }, value)
+  );
+}
+
+function card(...children) {
+  const c = h("div", { className: "card" });
+  children.flat(9).forEach(ch => { if (ch) c.append(ch); });
+  return c;
+}
+
+function sparkline(vals, w, ht, color) {
+  if (!vals || vals.length < 2) return "";
+  const min = Math.min(...vals), max = Math.max(...vals), range = max - min || 1;
+  const pts = vals.map((v, i) => `${(i/(vals.length-1))*w},${ht-((v-min)/range)*ht}`).join(" ");
+  return `<svg width="${w}" height="${ht}"><polyline points="${pts}" fill="none" stroke="${color||'#38bdf8'}" stroke-width="1.5"/></svg>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Tab renderers
+// ══════════════════════════════════════════════════════════════
+function renderLive(snap, history) {
+  if (!snap) return h("div", { style: { color: "#64748b", padding: "40px", textAlign: "center" } }, "No data yet");
+  const dd = snap.dd || 0;
+  const drop = (snap.peak || 0) - (snap.eq || 0);
+  const tmSt = snap.tmAlive < 0 ? "NOT FOUND" : snap.tmAlive > 30 ? "STALE" : "LIVE";
+  const tmType = tmSt === "LIVE" ? "green" : tmSt === "STALE" ? "amber" : "red";
+
+  const frag = document.createDocumentFragment();
+
+  // Account health
+  const c1 = card(
+    h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" } },
+      h("span", { style: { fontSize: "12px", color: "#64748b" } }, "Account Health"),
+      h("div", { style: { display: "flex", gap: "6px" } },
+        ...[
+          snap.def === 1 ? badge("DEFENSIVE", "amber") : null,
+          snap.kill === 1 ? badge("KILL SWITCH", "red") : null,
+          badge("TM " + tmSt, tmType)
+        ].filter(Boolean)
+      )
+    ),
+    h("div", { className: "row" },
+      stat("Balance", "$" + (snap.bal||0).toFixed(0)),
+      stat("Equity", "$" + (snap.eq||0).toFixed(0)),
+      stat("Drawdown", dd.toFixed(1) + "%", "c-" + ddType(dd))
+    ),
+    h("div", { className: "row", style: { marginTop: "10px" } },
+      stat("Peak", "$" + (snap.peak||0).toFixed(0)),
+      stat("Drop", "$" + drop.toFixed(0), drop > 150 ? "c-amber" : "c-dim"),
+      stat("Floor", "$" + (snap.floor||2000).toFixed(0))
+    ),
+    h("div", { innerHTML: sparkline((history||[]).map(h=>h.eq), 280, 50) })
+  );
+  frag.append(c1);
+
+  // Per pair
+  (snap.pairs || []).forEach(p => {
+    frag.append(card(
+      h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" } },
+        h("span", { style: { fontWeight: "700", fontSize: "14px" } }, p.n),
+        h("div", { style: { display: "flex", gap: "6px" } },
+          badge("ADX " + (p.adx?.toFixed(0)||"?"), statusType(p.st)),
+          ...(p.atrB === 1 ? [badge("ATR!", "red")] : []),
+          badge("↕ " + p.tr, p.tr === "UP" ? "green" : "red")
+        )
+      ),
+      h("div", { className: "row" },
+        stat("Buys", p.b || 0),
+        stat("Sells", p.s || 0),
+        stat("Float P&L", "$" + (p.fpnl||0).toFixed(2), pnlClass(p.fpnl))
+      )
+    ));
+  });
+
+  // Trade totals
+  frag.append(card(
+    h("div", { className: "row" },
+      stat("Total", (snap.trades||0) + "/" + (snap.cap||50)),
+      stat("Allowed", snap.dayA || 0, "c-green"),
+      stat("Blocked", snap.dayB || 0, (snap.dayB||0) > 0 ? "c-red" : "c-dim"),
+      stat("Cooldowns", snap.dayC || 0, "c-muted")
+    ),
+    h("div", { className: "minibar" },
+      h("div", { className: "minibar-fill", style: { width: Math.min(100, ((snap.trades||0)/(snap.cap||50))*100) + "%", background: "#3b82f6" } })
+    )
+  ));
+
+  // Open trades table
+  if ((snap.open || []).length > 0) {
+    const tbl = h("table");
+    const thead = h("thead", null, h("tr", null,
+      ...["#","Pair","Side","Lots","Open","P&L"].map(t => h("th", null, t))
+    ));
+    const tbody = h("tbody");
+    (snap.open || []).forEach(t => {
+      const tr = h("tr", null,
+        h("td", { className: "c-muted" }, ""+t.tk),
+        h("td", null, t.p),
+        h("td", { className: t.t==="B"?"c-green":"c-red" }, t.t==="B"?"BUY":"SELL"),
+        h("td", null, t.l?.toFixed(2)),
+        h("td", { className: "c-dim" }, t.op?.toFixed(5)),
+        h("td", { className: pnlClass(t.pnl), style: { fontWeight: "600" } }, "$"+t.pnl?.toFixed(2))
+      );
+      tbody.append(tr);
+    });
+    tbl.append(thead, tbody);
+    frag.append(card(
+      h("div", { style: { fontSize: "12px", color: "#64748b", marginBottom: "8px" } }, "Open Trades"),
+      h("div", { style: { overflowX: "auto" } }, tbl)
+    ));
+  }
+
+  return frag;
+}
+
+function renderPairs(snap, daily, period) {
+  if (!snap) return h("div", { style: { color: "#64748b", padding: "40px", textAlign: "center" } }, "No data");
+  const frag = document.createDocumentFragment();
+
+  (snap.pairs || []).forEach(p => {
+    let tc=0,tp=0,tw=0,tl=0,tbp=0,tbc=0,td=0;
+    const days = period==="30" ? (daily||[]).slice(-30) : (daily||[]);
+    days.forEach(d => {
+      const dp = (d.pairs||[]).find(x=>x.n===p.n);
+      if(dp){tc+=dp.closed||0;tp+=dp.pnl||0;tw+=dp.wins||0;tl+=dp.losses||0;tbp+=dp.blkPnl||0;tbc+=dp.blkClosed||0;td+=(dp.avgDur||0)*(dp.closed||0)}
+    });
+    const todayP = (snap.today||[]).find(x=>x.n===p.n);
+    if(todayP){tc+=todayP.closed||0;tp+=todayP.pnl||0;tw+=todayP.wins||0;tl+=todayP.losses||0;tbp+=todayP.blkPnl||0;tbc+=todayP.blkClosed||0;td+=(todayP.avgDur||0)*(todayP.closed||0)}
+    const wr = tc>0?(tw/tc*100):0;
+    const avgD = tc>0?td/tc:0;
+
+    frag.append(card(
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"10px"}},
+        h("span",{style:{fontWeight:"700",fontSize:"15px"}},p.n),
+        badge(p.st, statusType(p.st))
+      ),
+      h("div",{className:"flex-wrap",style:{marginBottom:"10px"}},
+        badge("ADX "+p.adx?.toFixed(0)+"/"+p.red, statusType(p.st)),
+        badge("ATR "+p.atr?.toFixed(1)+"x", p.atrB?"red":"green"),
+        badge("BRK "+(p.brk?"Y":"N"), p.brk?"amber":"muted"),
+        badge("Trend "+p.tr, p.tr==="UP"?"green":"red")
+      ),
+      h("div",{className:"row",style:{marginBottom:"8px"}},
+        stat("Closed P&L","$"+tp.toFixed(2),pnlClass(tp)),
+        stat("Win Rate",wr.toFixed(0)+"%",wr>=60?"c-green":wr>=40?"c-amber":"c-red"),
+        stat("Avg Duration",avgD.toFixed(0)+"m")
+      ),
+      h("div",{className:"row",style:{marginBottom:"8px"}},
+        stat("Trades",""+tc),
+        stat("W/L",tw+"/"+tl),
+        stat("Float","$"+(p.fpnl||0).toFixed(2),pnlClass(p.fpnl))
+      ),
+      h("div",{className:"sep"},
+        h("div",{className:"row"},
+          stat("Blocked Closed",""+tbc),
+          stat("Blocked P&L","$"+tbp.toFixed(2),pnlClass(tbp))
+        )
+      )
+    ));
+  });
+  return frag;
+}
+
+function renderManager(snap, daily) {
+  if (!snap) return h("div", { style: { color: "#64748b", padding: "40px", textAlign: "center" } }, "No data");
+  const frag = document.createDocumentFragment();
+  let tA=snap.dayA||0, tB=snap.dayB||0, tC=snap.dayC||0;
+  (daily||[]).forEach(d=>{tA+=d.allowed||0;tB+=d.blocked||0;tC+=d.cooldowns||0});
+  const tot=tA+tB;
+  const br=tot>0?(tB/tot*100):0;
+
+  frag.append(card(
+    h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"8px"}},"Trade Manager v5 Overview"),
+    h("div",{className:"row",style:{marginBottom:"8px"}},
+      stat("Allowed",""+tA,"c-green"),stat("Blocked",""+tB,tB>0?"c-red":"c-dim"),stat("Block Rate",br.toFixed(1)+"%")
+    ),
+    h("div",{className:"row"},
+      stat("Cooldowns",""+tC,"c-muted"),
+      stat("Mode",snap.def===1?"DEF":"NRM",snap.def===1?"c-amber":"c-green"),
+      stat("Kill",snap.kill===1?"ON":"OFF",snap.kill===1?"c-red":"c-green")
+    )
+  ));
+
+  // ADX status
+  const adxCard = card(h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"10px"}},"ADX Status (counter-trend blocks only)"));
+  (snap.pairs||[]).forEach((p,i)=>{
+    const blocked=p.st==="RED";
+    const side=p.tr==="UP"?"SELL":"BUY";
+    const row=h("div",{className:"pair-row"},
+      h("div",null,
+        h("span",{style:{fontWeight:"600"}},p.n),
+        h("span",{style:{marginLeft:"8px",fontSize:"12px",color:"#64748b"}},"ADX "+p.adx?.toFixed(0)+"/"+p.red)
+      ),
+      blocked?badge(side+" BLOCKED","red"):p.st==="HIGH"?badge("HIGH (no breakout)","amber"):badge("ALL CLEAR","green")
+    );
+    adxCard.append(row);
+  });
+  frag.append(adxCard);
+
+  // Rules
+  const rules=[
+    ["Equity Floor","$"+(snap.floor||2000).toFixed(0)],
+    ["Drawdown Limit",snap.def?"10%":"15%"],
+    ["Profit Lock","$200 drop → defensive"],
+    ["Total Cap",(snap.trades||0)+"/"+(snap.def?30:snap.cap||50)],
+    ["ADX Red (counter-trend)","Per pair thresholds"],
+    ["ATR Extreme","1.5x average"],
+    ["Anti-churn Cooldown","15 min after block"],
+    ["Breakout Confirmation","10-bar H1 range"]
+  ];
+  const rCard=card(h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"10px"}},"Active Rules (v5)"));
+  rules.forEach(([n,v])=>{
+    rCard.append(h("div",{className:"rule-row"},h("span",null,n),h("span",{className:"c-dim"},v)));
+  });
+  frag.append(rCard);
+  return frag;
+}
+
+function renderHistory(daily, history) {
+  if(!daily||daily.length===0) return h("div",{style:{color:"#64748b",padding:"40px",textAlign:"center"}},"No daily data yet");
+  const frag=document.createDocumentFragment();
+
+  // Balance chart
+  const bv=daily.map(d=>d.balClose||0).filter(v=>v>0);
+  if(bv.length>=2) frag.append(card(
+    h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"6px"}},"Balance History"),
+    h("div",{innerHTML:sparkline(bv,300,80,"#38bdf8")}),
+    h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:"11px",color:"#64748b",marginTop:"4px"}},
+      h("span",null,daily[0]?.date||""),h("span",null,daily[daily.length-1]?.date||""))
+  ));
+
+  // P&L bars
+  const pv=daily.map(d=>{let t=0;(d.pairs||[]).forEach(p=>t+=p.pnl||0);return t});
+  const mx=Math.max(...pv.map(Math.abs),1);
+  let barSvg=`<svg width="300" height="80"><line x1="0" y1="40" x2="300" y2="40" stroke="#1e293b" stroke-width="0.5"/>`;
+  pv.forEach((v,i)=>{
+    const bw=Math.max(2,300/pv.length-1);
+    const x=(i/pv.length)*300;
+    const bh=(Math.abs(v)/mx)*38;
+    const y=v>=0?40-bh:40;
+    barSvg+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${v>=0?'#22c55e':'#ef4444'}" rx="1" opacity="0.8"/>`;
+  });
+  barSvg+=`</svg>`;
+  frag.append(card(
+    h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"6px"}},"Daily P&L"),
+    h("div",{innerHTML:barSvg})
+  ));
+
+  // Table
+  const tbl=h("table");
+  tbl.append(h("thead",null,h("tr",null,...["Date","Balance","P&L","Trades","W/L","Blk"].map(t=>h("th",null,t)))));
+  const tbody=h("tbody");
+  [...daily].reverse().slice(0,30).forEach(d=>{
+    let pnl=0,cl=0,w=0,l=0;
+    (d.pairs||[]).forEach(p=>{pnl+=p.pnl||0;cl+=p.closed||0;w+=p.wins||0;l+=p.losses||0});
+    tbody.append(h("tr",null,
+      h("td",{className:"c-dim",style:{whiteSpace:"nowrap"}},(d.date||"").slice(5)),
+      h("td",null,"$"+(d.balClose||0).toFixed(0)),
+      h("td",{className:pnlClass(pnl),style:{fontWeight:"600"}},"$"+pnl.toFixed(2)),
+      h("td",null,""+cl),
+      h("td",{className:"c-dim"},w+"/"+l),
+      h("td",{className:(d.blocked||0)>0?"c-red":"c-muted"},""+(d.blocked||0))
+    ));
+  });
+  tbl.append(tbody);
+  frag.append(card(
+    h("div",{style:{fontSize:"12px",color:"#64748b",marginBottom:"8px"}},"Daily Summary"),
+    h("div",{style:{overflowX:"auto"}},tbl)
+  ));
+  return frag;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Main render
+// ══════════════════════════════════════════════════════════════
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  if (!state.url) {
+    app.innerHTML = `
+      <div class="setup">
+        <h1><span style="color:#38bdf8">TM</span> Dashboard</h1>
+        <p>Enter your Google Apps Script Web App URL to connect.</p>
+        <input id="urlInput" type="text" placeholder="https://script.google.com/macros/s/...">
+        <button class="connect" id="connectBtn">Connect</button>
+        <div style="font-size:11px;color:#64748b;margin-top:16px">
+          The URL is saved in your browser. Bookmark this page for quick access.
+        </div>
+        <button class="btn" id="demoBtn" style="margin-top:12px">Use Demo Data</button>
+      </div>`;
+    document.getElementById("connectBtn").onclick = () => {
+      const v = document.getElementById("urlInput").value;
+      if (v.length > 10) connect(v);
+    };
+    document.getElementById("demoBtn").onclick = () => connect("DEMO");
+    return;
+  }
+
+  const snap = state.data?.snapshot || null;
+
+  // Header
+  const header = h("div", { className: "header" },
+    h("div", { className: "title" },
+      h("span", null, "TM"), h("span", null, " Dashboard"),
+      ...(snap?.def === 1 ? [h("span", { style: { marginLeft: "8px" } }, badge("DEF", "amber"))] : [])
+    ),
+    h("div", { className: "hdr-right" },
+      ...(state.error ? [h("span", { style: { fontSize: "10px", color: "#ef4444" } }, "ERR")] : []),
+      ...(state.lastRefresh ? [h("span", { style: { fontSize: "10px", color: "#64748b" } },
+        state.lastRefresh.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))] : []),
+      h("button", { className: "btn", onClick: fetchData }, state.loading ? "..." : "↻"),
+      h("button", { className: "btn-x", onClick: disconnect }, "✕")
+    )
+  );
+  app.append(header);
+
+  // Error banner
+  if (state.error) {
+    const eb = h("div", { className: "err-banner" },
+      h("div", { style: { fontWeight: "600", marginBottom: "4px" } }, "Connection failed"),
+      h("div", { className: "msg" }, state.error)
+    );
+    app.append(eb);
+  }
+
+  // Period toggle
+  if (state.tab === "pairs" || state.tab === "history") {
+    const toggle = h("div", { className: "period-toggle" });
+    [["all", "All Time"], ["30", "30 Days"]].forEach(([id, label]) => {
+      const btn = h("button", {
+        className: "period-btn" + (state.period === id ? " active" : ""),
+        onClick: () => setState({ period: id })
+      }, label);
+      toggle.append(btn);
+    });
+    app.append(toggle);
+  }
+
+  // Content
+  const content = h("div", { className: "content" });
+  const daily = state.data?.daily || [];
+  const history = state.data?.snapHistory || [];
+
+  if (state.tab === "live") content.append(renderLive(snap, history));
+  else if (state.tab === "pairs") content.append(renderPairs(snap, daily, state.period));
+  else if (state.tab === "manager") content.append(renderManager(snap, daily));
+  else if (state.tab === "history") content.append(renderHistory(daily, history));
+  app.append(content);
+
+  // Tab bar
+  const tabBar = h("div", { className: "tab-bar" });
+  [["live","Live"],["pairs","Pairs"],["manager","Manager"],["history","History"]].forEach(([id,label]) => {
+    tabBar.append(h("button", {
+      className: "tab-btn" + (state.tab === id ? " active" : ""),
+      onClick: () => setState({ tab: id })
+    }, label));
+  });
+  app.append(tabBar);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Demo data
+// ══════════════════════════════════════════════════════════════
+function getDemoData() {
+  return {
+    snapshot: {
+      type:"snapshot",ts:"2026.04.02 14:30",acct:12345,
+      bal:3125.40,eq:3098.15,dd:0.9,peak:3180.00,floor:2000,
+      def:0,kill:0,trades:14,cap:50,dayA:18,dayB:3,dayC:1,tmAlive:5,
+      pairs:[
+        {n:"EURUSD",bid:1.08425,adx:18.3,red:30,st:"OK",tr:"UP",dip:22.1,dim:16.4,brk:0,atr:0.92,atrB:0,spr:12,sprN:8,b:3,s:2,fpnl:-12.40},
+        {n:"EURGBP",bid:0.85670,adx:31.2,red:30,st:"RED",tr:"DN",dip:14.8,dim:28.5,brk:1,atr:1.15,atrB:0,spr:15,sprN:10,b:2,s:3,fpnl:5.80},
+        {n:"GBPAUD",bid:2.07350,adx:22.6,red:40,st:"OK",tr:"UP",dip:19.3,dim:15.7,brk:0,atr:0.88,atrB:0,spr:28,sprN:22,b:2,s:2,fpnl:-8.10}
+      ],
+      open:[
+        {tk:50001,p:"EURUSD",t:"B",l:0.02,op:1.08500,cp:1.08425,pnl:-1.50,ot:"2026.04.02 10:15"},
+        {tk:50002,p:"EURUSD",t:"B",l:0.02,op:1.08320,cp:1.08425,pnl:2.10,ot:"2026.04.02 11:30"},
+        {tk:50003,p:"EURUSD",t:"S",l:0.02,op:1.08390,cp:1.08425,pnl:-0.70,ot:"2026.04.02 13:45"},
+        {tk:50010,p:"EURGBP",t:"B",l:0.02,op:0.85720,cp:0.85670,pnl:-1.00,ot:"2026.04.02 08:30"},
+        {tk:50011,p:"EURGBP",t:"S",l:0.02,op:0.85650,cp:0.85670,pnl:-0.40,ot:"2026.04.02 14:00"},
+        {tk:50012,p:"EURGBP",t:"S",l:0.03,op:0.85780,cp:0.85670,pnl:3.30,ot:"2026.04.02 06:00"},
+        {tk:50020,p:"GBPAUD",t:"B",l:0.02,op:2.07400,cp:2.07350,pnl:-1.00,ot:"2026.04.02 09:45"},
+        {tk:50021,p:"GBPAUD",t:"S",l:0.02,op:2.07500,cp:2.07350,pnl:3.00,ot:"2026.04.02 10:30"}
+      ],
+      today:[
+        {n:"EURUSD",closed:8,pnl:5.20,wins:6,losses:2,avgDur:42,blkClosed:1,blkPnl:-1.10},
+        {n:"EURGBP",closed:6,pnl:3.80,wins:5,losses:1,avgDur:55,blkClosed:2,blkPnl:-2.40},
+        {n:"GBPAUD",closed:4,pnl:2.10,wins:3,losses:1,avgDur:68,blkClosed:0,blkPnl:0}
+      ]
+    },
+    daily:Array.from({length:14},(_,i)=>{
+      const d=new Date(2026,2,19+i);
+      const ds=d.getFullYear()+"."+String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0");
+      const base=3020+i*8+(Math.random()-.3)*15;
+      return{date:ds,balOpen:base-8,balClose:base,eqClose:base-Math.random()*30,peak:3180,
+        allowed:Math.floor(15+Math.random()*20),blocked:Math.floor(Math.random()*8),cooldowns:Math.floor(Math.random()*3),
+        pairs:[
+          {n:"EURUSD",closed:Math.floor(5+Math.random()*8),pnl:2+(Math.random()-.3)*6,wins:Math.floor(4+Math.random()*5),losses:Math.floor(Math.random()*3),avgDur:40+Math.random()*30,blkClosed:Math.floor(Math.random()*2),blkPnl:-(Math.random()*2)},
+          {n:"EURGBP",closed:Math.floor(3+Math.random()*5),pnl:1+(Math.random()-.3)*4,wins:Math.floor(2+Math.random()*4),losses:Math.floor(Math.random()*2),avgDur:50+Math.random()*40,blkClosed:Math.floor(Math.random()*2),blkPnl:-(Math.random()*1.5)},
+          {n:"GBPAUD",closed:Math.floor(2+Math.random()*4),pnl:.5+(Math.random()-.4)*5,wins:Math.floor(1+Math.random()*3),losses:Math.floor(Math.random()*2),avgDur:60+Math.random()*50,blkClosed:0,blkPnl:0}
+        ]};
+    }),
+    snapHistory:Array.from({length:48},(_,i)=>({
+      ts:`2026.04.02 ${String(Math.floor(i/4)+6).padStart(2,"0")}:${String((i%4)*15).padStart(2,"0")}`,
+      bal:3125+Math.sin(i*.3)*8,eq:3098+Math.sin(i*.3)*12+Math.cos(i*.7)*5,
+      dd:.5+Math.abs(Math.sin(i*.2))*2,trades:12+Math.floor(Math.sin(i*.4)*4),def:0
+    }))
+  };
+}
+
+// Boot
+render();
+if (state.url) fetchData();
+</script>
+</body>
+</html>
