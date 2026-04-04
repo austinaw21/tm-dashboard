@@ -14,6 +14,7 @@
   --amb:#f59e0b;--amb2:rgba(245,158,11,.12);--ambB:rgba(245,158,11,.3);
   --red:#ef4444;--red2:rgba(239,68,68,.12);--redB:rgba(239,68,68,.3);
   --blu:#3b82f6;--blu2:rgba(59,130,246,.1);--bluB:rgba(59,130,246,.3);
+  --cyn:#06b6d4;--cyn2:rgba(6,182,212,.12);
   --r:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -27,12 +28,13 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .hdr-title{font-size:13px;font-weight:700;letter-spacing:.5px}
 .hdr-title .a{color:var(--blu)}
 .hdr-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px}
-.hdr-sub{font-size:10px;color:var(--mt);margin-top:2px}
+.hdr-sub{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
 .hdr-strip{display:flex;gap:10px;margin-top:6px;font-size:11px}
 .hdr-strip .v{font-weight:600}
+.session-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--cyn2);color:var(--cyn);letter-spacing:.3px}
 
 /* Tabs */
-.tabs{position:sticky;top:52px;z-index:15;background:var(--bg);display:flex;border-bottom:1px solid var(--bd)}
+.tabs{position:sticky;top:56px;z-index:15;background:var(--bg);display:flex;border-bottom:1px solid var(--bd)}
 .tab{flex:1;padding:8px 0;text-align:center;font-size:10px;font-weight:600;letter-spacing:.5px;
   color:var(--mt);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
 .tab.on{color:var(--blu);border-bottom-color:var(--blu)}
@@ -54,8 +56,11 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .m-l{font-size:9px;color:var(--dim);margin-bottom:1px}
 .m-v{font-size:15px;font-weight:600}
 
-/* Regime banner */
-.regime{border-radius:var(--r);padding:10px 12px;margin-bottom:10px;text-align:center;font-weight:700;font-size:13px;letter-spacing:1px}
+/* Action bar */
+.action-bar{border-radius:var(--r);padding:10px 12px;margin-bottom:10px;font-size:11px;line-height:1.5}
+.action-bar .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.action-bar .msg{font-weight:500}
+.action-bar .blockers{font-size:10px;color:var(--dim);margin-top:4px}
 
 /* Pill */
 .pill{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px}
@@ -64,22 +69,27 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .pbar{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;margin:4px 0}
 .pbar-fill{height:100%;border-radius:3px;transition:width .5s}
 
+/* Percentile bar */
+.pctl-bar{position:relative;height:10px;background:linear-gradient(90deg,var(--red2),var(--sf2) 30%,var(--sf2) 70%,var(--red2));border-radius:5px;margin:4px 0}
+.pctl-dot{position:absolute;top:0;width:10px;height:10px;border-radius:50%;background:var(--tx);border:2px solid var(--blu);transform:translateX(-50%)}
+
 /* Row */
 .row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
 .row+.row{border-top:1px solid var(--bd)}
 .row-l{font-size:10px;color:var(--dim)}
 .row-v{font-size:11px;font-weight:600}
 
-/* Trade rows */
-.tr-row{padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px}
-.tr-row:last-child{border:none}
-.tr-top{display:flex;justify-content:space-between;align-items:center}
-.tr-bot{display:flex;gap:8px;font-size:9px;color:var(--dim);margin-top:2px}
+/* Alert */
+.alert{border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:11px;display:flex;gap:6px;align-items:flex-start}
+.alert-icon{font-size:14px;flex-shrink:0;line-height:1}
 
 /* Pair cards */
 .pcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:10px;margin-bottom:8px}
 .pcard-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .pcard-name{font-size:12px;font-weight:700}
+
+/* Condition badge */
+.cond{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:.3px}
 
 /* Badge */
 .badge{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
@@ -106,9 +116,6 @@ svg text{font-family:inherit}
 .connect button{background:var(--blu);color:#fff;border:none;border-radius:6px;
   font:inherit;font-weight:700;font-size:12px;padding:10px 24px;cursor:pointer}
 
-/* Alerts */
-.alert{border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:11px;display:flex;gap:6px;align-items:center}
-
 /* Utility */
 .neg{color:var(--red)}.pos{color:var(--grn)}.warn{color:var(--amb)}
 .dim{color:var(--dim)}.mt4{margin-top:4px}.mb4{margin-bottom:4px}
@@ -122,29 +129,27 @@ svg text{font-family:inherit}
 <body>
 
 <div id="app">
-  <!-- Connect screen (shown when no URL) -->
   <div class="connect" id="connectScreen">
     <h2>TM Dashboard</h2>
     <p>Paste your Google Apps Script URL to connect</p>
     <input id="urlInput" placeholder="https://script.google.com/macros/s/.../exec" spellcheck="false">
     <button onclick="saveUrl()">Connect</button>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);width:100%">
+      <p style="font-size:10px;color:var(--mt);margin-bottom:8px">Or preview with sample data</p>
+      <button onclick="loadDemo()" style="background:var(--sf2);border:1px solid var(--bd);color:var(--dim)">Demo Mode</button>
+    </div>
   </div>
 
-  <!-- Main dashboard (hidden until connected) -->
   <div id="dashboard" class="hidden">
     <div class="hdr" id="hdr"></div>
     <div class="tabs" id="tabs">
-      <div class="tab on" data-t="live">LIVE</div>
-      <div class="tab" data-t="lots">LOTS</div>
+      <div class="tab on" data-t="status">STATUS</div>
       <div class="tab" data-t="pairs">PAIRS</div>
-      <div class="tab" data-t="mgr">MGR</div>
-      <div class="tab" data-t="hist">HIST</div>
+      <div class="tab" data-t="pnl">P&L</div>
     </div>
-    <div class="pane on" id="p-live"></div>
-    <div class="pane" id="p-lots"></div>
+    <div class="pane on" id="p-status"></div>
     <div class="pane" id="p-pairs"></div>
-    <div class="pane" id="p-mgr"></div>
-    <div class="pane" id="p-hist"></div>
+    <div class="pane" id="p-pnl"></div>
   </div>
 </div>
 
@@ -154,21 +159,20 @@ svg text{font-family:inherit}
 // ============================================================
 const S = {
   url: localStorage.getItem('tm_url') || '',
-  data: null,   // { latest, snapshots, daily }
+  data: null,       // { latest, snapshots, daily }
+  indicators: null,  // indicator history (24h)
   err: null,
   loading: false,
-  tab: 'live',
+  tab: 'status',
   refreshMs: 180000,
   timer: null,
-  settings: JSON.parse(localStorage.getItem('tm_settings') || '{}'),
-  withdrawals: JSON.parse(localStorage.getItem('tm_wd') || '[]'),
 };
 
 // ============================================================
 // Boot
 // ============================================================
 if (S.url) { showDashboard(); fetchData(); }
-else document.getElementById('connectScreen').classList.remove('hidden');
+else { document.getElementById('connectScreen').classList.remove('hidden'); loadDemo(); }
 
 function saveUrl() {
   const v = document.getElementById('urlInput').value.trim();
@@ -182,13 +186,6 @@ function saveUrl() {
 function showDashboard() {
   document.getElementById('connectScreen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  setupTabs();
-}
-
-// ============================================================
-// Tabs
-// ============================================================
-function setupTabs() {
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
@@ -201,21 +198,29 @@ function setupTabs() {
 }
 
 // ============================================================
-// Data fetching
+// Data fetching — two endpoints
 // ============================================================
 async function fetchData() {
   S.loading = true;
   renderHeader();
   try {
-    const r = await fetch(S.url + '?action=all');
-    const text = await r.text();
-    if (text.trim().charAt(0) !== '{') {
-      S.err = 'Response is not JSON — check your Apps Script URL and deployment';
+    const [mainR, indR] = await Promise.all([
+      fetch(S.url + '?action=all'),
+      fetch(S.url + '?action=indicators&hours=24')
+    ]);
+    const mainText = await mainR.text();
+    if (mainText.trim().charAt(0) !== '{') {
+      S.err = 'Response is not JSON — check URL';
     } else {
-      const d = JSON.parse(text);
+      const d = JSON.parse(mainText);
       if (d.status === 'ok') { S.data = d; S.err = null; }
       else S.err = d.msg || 'Unknown error';
     }
+    try {
+      const indText = await indR.text();
+      const indD = JSON.parse(indText);
+      if (indD.status === 'ok') S.indicators = indD.indicators || [];
+    } catch(e) { S.indicators = []; }
   } catch(e) { S.err = e.message; }
   S.loading = false;
   render();
@@ -224,128 +229,148 @@ async function fetchData() {
 }
 
 // ============================================================
-// Regime calculation
+// Regime calculation — Option B full integration
 // ============================================================
 function calcRegime() {
-  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], gates:[] };
+  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], gates:[], primeBlockers:[] };
   const L = S.data.latest;
   const D = S.data.daily || [];
 
   // DEFENSIVE from TM
-  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], gates:[] };
+  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], gates:[], primeBlockers:[] };
 
   const cautionR = [];
   const primeBlock = [];
 
-  // DD check
+  // --- EXISTING CAUTION TRIGGERS ---
   if (L.acct && L.tm && L.acct.dd >= L.tm.ddSoft)
-    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% >= ' + L.tm.ddSoft + '%');
+    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% ≥ ' + L.tm.ddSoft + '%');
 
-  // Per-pair checks
   if (L.pairs) {
     for (const p of L.pairs) {
       const grid = Math.max(p.buyN || 0, p.sellN || 0);
       const adxPct = p.adxR > 0 ? (p.adx / p.adxR) : 0;
 
-      // CAUTION triggers
+      // Existing CAUTION
       if (adxPct >= 0.8 && p.brk) cautionR.push(p.n + ' ADX ' + p.adx.toFixed(0) + ' (' + (adxPct*100).toFixed(0) + '%)');
-      if (grid >= 6) cautionR.push(p.n + ' grid ' + grid);
+      if (grid >= 6) cautionR.push(p.n + ' grid depth ' + grid + ' trades');
       if (p.atrR >= 1.3) cautionR.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
       if (p.fb) cautionR.push(p.n + ' float breaker');
 
-      // PRIME blockers
+      // --- NEW CAUTION TRIGGERS ---
+      // Grid depth in pips
+      const maxDepth = Math.max(p.buyDepth || 0, p.sellDepth || 0);
+      if (maxDepth >= 50) cautionR.push(p.n + ' grid ' + maxDepth.toFixed(0) + ' pips deep');
+
+      // Grid velocity
+      const maxVel = Math.max(p.buyVel || 0, p.sellVel || 0);
+      if (maxVel >= 3) cautionR.push(p.n + ' velocity ' + maxVel + ' trades/hr');
+
+      // Oldest trade age >= 24h
+      const maxAge = Math.max(p.oldBuyAge || 0, p.oldSellAge || 0);
+      if (maxAge >= 1440) cautionR.push(p.n + ' stuck grid ' + Math.floor(maxAge/60) + 'h');
+
+      // H4 ADX divergence — H4 trending against dominant grid, H1 hasn't caught up
+      if ((p.adxH4 || 0) >= 25 && adxPct < 0.8) {
+        const h4Bull = (p.diPH4 || 0) > (p.diMH4 || 0);
+        const dominantSide = (p.buyN || 0) >= (p.sellN || 0) ? 'buy' : 'sell';
+        if ((dominantSide === 'buy' && !h4Bull) || (dominantSide === 'sell' && h4Bull)) {
+          cautionR.push(p.n + ' H4 trend developing against ' + dominantSide + ' grid');
+        }
+      }
+
+      // --- EXISTING PRIME BLOCKERS ---
       if (adxPct >= 0.7) primeBlock.push(p.n + ' ADX ' + (adxPct*100).toFixed(0) + '%');
       if (p.atrR >= 1.1) primeBlock.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
-      if (grid > 4) primeBlock.push(p.n + ' grid ' + grid);
+      if (grid > 4) primeBlock.push(p.n + ' grid ' + grid + ' trades');
+
+      // --- NEW PRIME BLOCKERS ---
+      if (maxDepth > 20) primeBlock.push(p.n + ' grid ' + maxDepth.toFixed(0) + ' pips');
+      if (maxAge > 360) primeBlock.push(p.n + ' trade open ' + Math.floor(maxAge/60) + 'h');
+
+      // Price percentile against grid
+      const prcPct = p.prcPct || 50;
+      if ((p.buyN || 0) > 0 && prcPct > 80) primeBlock.push(p.n + ' buys at ' + prcPct.toFixed(0) + ' pctl');
+      if ((p.sellN || 0) > 0 && prcPct < 20) primeBlock.push(p.n + ' sells at ' + prcPct.toFixed(0) + ' pctl');
+
+      // ADX slope rising with counter-trend grid
+      if ((p.adxSlp || 0) > 0 && grid > 0) {
+        const h1Bull = (p.diP || 0) > (p.diM || 0);
+        const domSide = (p.buyN || 0) >= (p.sellN || 0) ? 'buy' : 'sell';
+        if ((domSide === 'buy' && !h1Bull) || (domSide === 'sell' && h1Bull)) {
+          primeBlock.push(p.n + ' ADX rising against grid');
+        }
+      }
+
+      // RSI extreme against grid
+      const rsi = p.rsi || 50;
+      if ((p.buyN || 0) > (p.sellN || 0) && rsi > 72) primeBlock.push(p.n + ' RSI ' + rsi.toFixed(0) + ' (overbought w/ buys)');
+      if ((p.sellN || 0) > (p.buyN || 0) && rsi < 28) primeBlock.push(p.n + ' RSI ' + rsi.toFixed(0) + ' (oversold w/ sells)');
     }
+  }
+
+  // EUR Correlation — both CAUTION and PRIME blocker
+  if (L.eurCorr) {
+    cautionR.push('EUR pairs correlated — doubled exposure');
   }
 
   // Loss streak
   const streak = calcLossStreak(D);
   if (streak >= 4) cautionR.push(streak + '-day loss streak');
 
-  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, gates:primeBlock };
+  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, gates:[], primeBlockers:primeBlock };
 
-  // PRIME checks
+  // --- PRIME evaluation ---
   const pnl7d = calc7dPnl(D);
   if (pnl7d <= 0) primeBlock.push('7d P&L $' + pnl7d.toFixed(2));
   const rf = calcRF(D);
   if (rf < 1.5 && rf >= 0) primeBlock.push('RF ' + rf.toFixed(1));
-  // 7d max DD vs cushion
   if (L.acct) {
     const cushion = L.acct.eq - L.acct.floor;
     const dd7d = calc7dMaxDD();
     if (cushion > 0 && dd7d > cushion * 0.4) primeBlock.push('7d DD > 40% cushion');
   }
+  if (L.eurCorr) primeBlock.push('EUR correlation active');
 
-  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], gates:[] };
-  return { r:'NORMAL', c:'var(--blu)', reasons:[], gates:primeBlock };
+  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], gates:[], primeBlockers:[] };
+  return { r:'NORMAL', c:'var(--blu)', reasons:[], gates:[], primeBlockers:primeBlock };
 }
 
+// ============================================================
+// Helpers
+// ============================================================
 function calcLossStreak(daily) {
   if (!daily || daily.length === 0) return 0;
-  // Group by date, sum P&L
   const byDate = {};
-  for (const d of daily) {
-    if (!byDate[d.date]) byDate[d.date] = 0;
-    byDate[d.date] += d.pnl || 0;
-  }
-  const dates = Object.keys(byDate).sort().reverse();
-  let streak = 0;
-  for (const dt of dates) {
-    if (byDate[dt] < 0) streak++;
-    else break;
-  }
-  return streak;
+  for (const d of daily) { byDate[d.date] = (byDate[d.date]||0) + (d.pnl||0); }
+  let s = 0;
+  for (const dt of Object.keys(byDate).sort().reverse()) { if (byDate[dt] < 0) s++; else break; }
+  return s;
 }
 
 function calc7dPnl(daily) {
   if (!daily) return 0;
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
-  const cutStr = cutoff.toISOString().substring(0,10).replace(/-/g,'.');
-  let sum = 0;
-  for (const d of daily) {
-    if (d.date >= cutStr) sum += d.pnl || 0;
-  }
-  return sum;
+  const c = new Date(); c.setDate(c.getDate()-7);
+  const cs = c.toISOString().substring(0,10).replace(/-/g,'.');
+  return daily.filter(d=>d.date>=cs).reduce((s,d)=>s+(d.pnl||0),0);
 }
 
 function calcRF(daily) {
-  if (!daily || daily.length === 0) return 0;
-  // RF = cumulative P&L / max drawdown from daily P&L curve
-  const byDate = {};
-  for (const d of daily) {
-    if (!byDate[d.date]) byDate[d.date] = 0;
-    byDate[d.date] += d.pnl || 0;
-  }
-  const dates = Object.keys(byDate).sort();
-  let cum = 0, peak = 0, maxDD = 0;
-  for (const dt of dates) {
-    cum += byDate[dt];
-    if (cum > peak) peak = cum;
-    const dd = peak - cum;
-    if (dd > maxDD) maxDD = dd;
-  }
-  if (maxDD <= 0) return cum > 0 ? 99 : 0;
-  return cum / maxDD;
+  if (!daily || !daily.length) return 0;
+  const bd = {};
+  for (const d of daily) bd[d.date] = (bd[d.date]||0) + (d.pnl||0);
+  let cum=0, pk=0, mdd=0;
+  for (const dt of Object.keys(bd).sort()) { cum+=bd[dt]; if(cum>pk) pk=cum; const dd=pk-cum; if(dd>mdd) mdd=dd; }
+  return mdd<=0 ? (cum>0?99:0) : cum/mdd;
 }
 
 function calc7dMaxDD() {
   if (!S.data || !S.data.snapshots) return 0;
-  const snaps = S.data.snapshots;
-  if (snaps.length === 0) return 0;
-  let maxDD = 0;
-  for (const s of snaps) {
-    if (s.dd > maxDD) maxDD = s.dd;
-  }
-  // Convert from % to $
-  const bal = S.data.latest ? S.data.latest.acct.bal : 0;
-  return bal * maxDD / 100;
+  let mx = 0;
+  for (const s of S.data.snapshots) if(s.dd > mx) mx = s.dd;
+  return (S.data.latest ? S.data.latest.acct.bal : 0) * mx / 100;
 }
 
-// ============================================================
-// Lot recommendation
-// ============================================================
 function calcLots() {
   if (!S.data || !S.data.latest) return null;
   const L = S.data.latest;
@@ -371,16 +396,75 @@ function calcLots() {
   return { rec, hardMax, tierMax, cushion, perPair, pct, regime: reg };
 }
 
+function calcExpectancy(daily, pairName) {
+  const rows = pairName ? daily.filter(d => d.pair === pairName) : daily;
+  let totalGWin = 0, totalGLoss = 0, totalWins = 0, totalLosses = 0;
+  for (const d of rows) {
+    totalGWin += d.grossWin || 0;
+    totalGLoss += d.grossLoss || 0;
+    totalWins += d.wins || 0;
+    totalLosses += d.losses || 0;
+  }
+  const total = totalWins + totalLosses;
+  if (total === 0) return null;
+  const winRate = totalWins / total;
+  const avgWin = totalWins > 0 ? totalGWin / totalWins : 0;
+  const avgLoss = totalLosses > 0 ? totalGLoss / totalLosses : 0;
+  const exp = (winRate * avgWin) - ((1 - winRate) * avgLoss);
+  const pf = totalGLoss > 0 ? totalGWin / totalGLoss : (totalGWin > 0 ? 99 : 0);
+  return { exp, pf, winRate, avgWin, avgLoss, totalWins, totalLosses };
+}
+
+function pairCondition(p) {
+  // Returns 'favorable', 'neutral', or 'unfavorable' based on current indicators
+  let score = 0; // positive = favorable, negative = unfavorable
+  const reasons = [];
+
+  // ADX — low = good for grids
+  const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
+  if (adxPct < 0.5) { score += 1; reasons.push('Low ADX'); }
+  else if (adxPct >= 0.8) { score -= 2; reasons.push('High ADX'); }
+  else if (adxPct >= 0.7) { score -= 1; }
+
+  // BBW — tight = squeeze = good
+  const bbw = p.bbw || 0;
+  if (bbw > 0 && bbw < 0.005) { score += 1; reasons.push('Tight BBW'); }
+  else if (bbw > 0.015) { score -= 1; reasons.push('Wide BBW'); }
+
+  // Grid depth — deep = bad
+  const maxDepth = Math.max(p.buyDepth || 0, p.sellDepth || 0);
+  if (maxDepth > 50) { score -= 2; reasons.push('Deep grid'); }
+  else if (maxDepth > 20) { score -= 1; }
+  else if (maxDepth === 0) { score += 1; }
+
+  // Daily range consumed — high = less room for trouble
+  const rngPct = p.rngPct || 50;
+  if (rngPct > 80) { score += 1; reasons.push('Range spent'); }
+
+  // Grid velocity
+  const maxVel = Math.max(p.buyVel || 0, p.sellVel || 0);
+  if (maxVel >= 3) { score -= 2; reasons.push('Rapid stacking'); }
+
+  // ATR ratio
+  if (p.atrR >= 1.3) { score -= 1; reasons.push('High ATR'); }
+  else if (p.atrR < 0.8) { score += 1; reasons.push('Calm market'); }
+
+  let label, col;
+  if (score >= 2) { label = 'FAVORABLE'; col = 'var(--grn)'; }
+  else if (score <= -2) { label = 'UNFAVORABLE'; col = 'var(--red)'; }
+  else { label = 'NEUTRAL'; col = 'var(--dim)'; }
+
+  return { label, col, reasons, score };
+}
+
 // ============================================================
 // Render
 // ============================================================
 function render() {
   renderHeader();
-  renderLive();
-  renderLots();
+  renderStatus();
   renderPairs();
-  renderMgr();
-  renderHist();
+  renderPnl();
 }
 
 // ============================================================
@@ -396,79 +480,101 @@ function renderHeader() {
   const L = S.data.latest;
   const a = L.acct;
   const reg = calcRegime();
+  const session = L.session || '';
   el.innerHTML = `<div class="hdr-top">
     <span class="hdr-title"><span class="a">TM</span> Dashboard <span class="hdr-dot" style="background:${reg.c}"></span></span>
-    <span class="dim" style="font-size:9px">${L.ts ? L.ts.substring(11,16) : ''} GMT</span>
+    <span class="fx gap4" style="align-items:center">
+      ${session ? '<span class="session-badge">' + session.toUpperCase() + '</span>' : ''}
+      <span class="dim" style="font-size:9px">${L.ts ? L.ts.substring(11,16) : ''}</span>
+    </span>
   </div>
   <div class="hdr-strip">
-    <span>B <span class="v">$${a.bal.toFixed(0)}</span></span>
     <span>E <span class="v">$${a.eq.toFixed(0)}</span></span>
     <span>DD <span class="v ${a.dd > 10 ? 'neg' : a.dd > 5 ? 'warn' : ''}">${a.dd.toFixed(1)}%</span></span>
+    <span>F <span class="v ${(a.eq-a.floor)<50?'neg':'pos'}">$${(a.eq-a.floor).toFixed(0)}</span></span>
     <span class="pill" style="background:${reg.c}22;color:${reg.c};border:1px solid ${reg.c}44">${reg.r}</span>
   </div>`;
 }
 
 // ============================================================
-// LIVE tab
+// STATUS tab
 // ============================================================
-function renderLive() {
-  const el = document.getElementById('p-live');
+function renderStatus() {
+  const el = document.getElementById('p-status');
   if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">Waiting for data...</div>'; return; }
   const L = S.data.latest;
   const a = L.acct;
   const reg = calcRegime();
   const tm = L.tm || {};
+  const lots = calcLots();
   let h = '';
 
-  // Regime banner
-  h += `<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
+  // === ACTION BAR ===
+  h += buildActionBar(reg, lots);
 
-  // Alerts
-  if (tm.kill) h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span style="color:var(--red)">KILL SWITCH ACTIVATED</span></div>`;
-  if (reg.reasons && reg.reasons.length > 0) {
-    h += `<div class="alert" style="background:${reg.c}12;border:1px solid ${reg.c}33;color:${reg.c}">`;
-    h += reg.reasons.map(r => '• ' + r).join('<br>') + '</div>';
+  // === ALERTS ===
+  if (tm.kill) h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)">
+    <span class="alert-icon">⛔</span><span style="color:var(--red);font-weight:700">KILL SWITCH — All trading halted</span></div>`;
+
+  if (L.eurCorr) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)">
+    <span class="alert-icon">⚠</span><span style="color:var(--amb)">EUR correlation — both EUR pairs in drawdown, doubled exposure</span></div>`;
+
+  if (L.pairs) {
+    for (const p of L.pairs) {
+      const maxVel = Math.max(p.buyVel||0, p.sellVel||0);
+      if (maxVel >= 3) {
+        const side = (p.buyVel||0) >= (p.sellVel||0) ? 'buy' : 'sell';
+        h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)">
+          <span class="alert-icon">🔺</span><span style="color:var(--red)">${p.n} rapid ${side} stacking — ${maxVel} trades in 60 min</span></div>`;
+      }
+      const maxAge = Math.max(p.oldBuyAge||0, p.oldSellAge||0);
+      if (maxAge >= 1440) {
+        const hrs = Math.floor(maxAge/60);
+        const side = (p.oldBuyAge||0) >= (p.oldSellAge||0) ? 'buy' : 'sell';
+        h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)">
+          <span class="alert-icon">⏱</span><span style="color:var(--amb)">${p.n} ${side} grid stuck ${hrs}h</span></div>`;
+      }
+    }
   }
-  if (!tm.active) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB);color:var(--amb)">Trade Manager offline</div>`;
 
-  // Account card
+  if (!tm.active) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)">
+    <span class="alert-icon">⚠</span><span style="color:var(--amb)">Trade Manager offline</span></div>`;
+
+  // === ACCOUNT CARD ===
   h += `<div class="card"><div class="card-t">Account</div><div class="mg mg3">
     <div class="m"><div class="m-l">Balance</div><div class="m-v">$${a.bal.toFixed(0)}</div></div>
     <div class="m"><div class="m-l">Equity</div><div class="m-v">$${a.eq.toFixed(0)}</div></div>
     <div class="m"><div class="m-l">Drawdown</div><div class="m-v ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</div></div>
-  </div><div class="mg mg3">
-    <div class="m"><div class="m-l">Peak</div><div class="m-v">$${a.peak.toFixed(0)}</div></div>
-    <div class="m"><div class="m-l">Floor</div><div class="m-v">$${a.floor.toFixed(0)}</div></div>
-    <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${(a.eq - a.floor).toFixed(0)}</div></div>
   </div>`;
-  // Equity sparkline
   h += renderSparkline();
   h += '</div>';
 
-  // Lot suggestion (compact)
-  const lots = calcLots();
+  // === LOT RECOMMENDATION (compact) ===
   if (lots) {
-    h += `<div class="card"><div class="card-t">Lot Sizing</div>
-      <div class="fxb"><span>Recommended</span><span class="m-v" style="font-size:18px">${lots.rec.toFixed(2)}</span></div>
-      <div class="pbar"><div class="pbar-fill" style="width:${lots.pct}%;background:${lots.regime.c}"></div></div>
-      <div class="fxb dim" style="font-size:9px"><span>Base 0.01</span><span>Max ${lots.hardMax.toFixed(2)}</span></div>
+    h += `<div class="card"><div class="fxb">
+      <div><div class="card-t" style="margin:0">Lot Size</div></div>
+      <div class="m-v" style="font-size:20px;color:${reg.c}">${lots.rec.toFixed(2)}</div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:${lots.pct}%;background:${reg.c}"></div></div>
+    <div class="fxb dim" style="font-size:9px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
     </div>`;
   }
 
-  // Per-pair status rows
+  // === PAIR QUICK STATUS ===
   if (L.pairs) {
-    h += `<div class="card"><div class="card-t">Pairs Status</div>`;
+    h += `<div class="card"><div class="card-t">Pairs</div>`;
     for (const p of L.pairs) {
-      const grid = Math.max(p.buyN||0, p.sellN||0);
+      const maxDepth = Math.max(p.buyDepth||0, p.sellDepth||0);
+      const cond = pairCondition(p);
       const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
       const adxCol = adxPct >= 0.8 ? 'var(--red)' : adxPct >= 0.7 ? 'var(--amb)' : 'var(--grn)';
+
       h += `<div class="row"><div>
         <div style="font-weight:700;font-size:11px">${p.n}</div>
         <div class="badge">
-          <span class="bdg" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
-          <span class="bdg" style="background:var(--sf2);color:var(--dim)">G:${grid}</span>
-          ${p.fb ? '<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT</span>' : ''}
-          ${p.cdB||p.cdS ? '<span class="bdg" style="background:var(--amb2);color:var(--amb)">CD</span>' : ''}
+          <span class="bdg" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}</span>
+          ${maxDepth > 0 ? '<span class="bdg" style="background:var(--sf2);color:var(--dim)">' + maxDepth.toFixed(0) + 'p</span>' : ''}
+          <span class="bdg" style="background:${cond.col}22;color:${cond.col}">${cond.label}</span>
         </div></div>
         <div class="tar"><div class="${(p.floatPnl||0)>=0?'pos':'neg'}" style="font-weight:600">$${(p.floatPnl||0).toFixed(2)}</div>
         <div class="dim" style="font-size:9px">${p.buyN||0}B / ${p.sellN||0}S</div></div>
@@ -477,98 +583,53 @@ function renderLive() {
     h += '</div>';
   }
 
-  // Trade count bar
+  // === TRADE COUNT ===
   const total = L.totalOpen || 0;
   const maxT = tm.maxT || 50;
-  h += `<div class="card"><div class="card-t">Trades</div>
-    <div class="fxb"><span>${total} / ${maxT} open</span>
-    <span class="dim">A:${tm.dayA||0} B:${tm.dayB||0} C:${tm.dayC||0}</span></div>
-    <div class="pbar"><div class="pbar-fill" style="width:${(total/maxT*100).toFixed(0)}%;background:${total/maxT>0.8?'var(--red)':total/maxT>0.5?'var(--amb)':'var(--grn)'}"></div></div>
+  h += `<div class="card"><div class="fxb">
+    <span class="card-t" style="margin:0">Trades ${total}/${maxT}</span>
+    <span class="dim" style="font-size:9px">A:${tm.dayA||0} B:${tm.dayB||0} C:${tm.dayC||0}</span>
+  </div>
+  <div class="pbar"><div class="pbar-fill" style="width:${(total/maxT*100).toFixed(0)}%;background:${total/maxT>0.8?'var(--red)':total/maxT>0.5?'var(--amb)':'var(--grn)'}"></div></div>
   </div>`;
-
-  // Open trades (collapsible)
-  if (L.trades && L.trades.length > 0) {
-    const sorted = [...L.trades].sort((a,b) => a.pl - b.pl);
-    h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Open Trades (${sorted.length})</div>
-      <button class="coll-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Hide':'Show'">Show</button></div>
-      <div class="coll-body">`;
-    for (const t of sorted) {
-      h += `<div class="tr-row"><div class="tr-top">
-        <span><span style="font-weight:700">${t.pr}</span> <span class="${t.ty==='B'?'pos':'neg'}">${t.ty}</span> ${t.lt}</span>
-        <span class="${t.pl>=0?'pos':'neg'}" style="font-weight:600">$${t.pl.toFixed(2)}</span>
-      </div><div class="tr-bot">
-        <span>@${t.op}</span><span>${t.dur}min</span>${t.sl>0?'<span>SL:'+t.sl+'</span>':''}
-      </div></div>`;
-    }
-    h += '</div></div>';
-  }
 
   el.innerHTML = h;
 }
 
-// ============================================================
-// LOTS tab
-// ============================================================
-function renderLots() {
-  const el = document.getElementById('p-lots');
-  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
-  const L = S.data.latest;
-  const lots = calcLots();
-  const reg = lots ? lots.regime : calcRegime();
-  let h = '';
+function buildActionBar(reg, lots) {
+  let msg = '', blockerStr = '';
+  const bgAlpha = '18', borderAlpha = '33';
 
-  h += `<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
-
-  if (lots) {
-    // Main recommendation
-    h += `<div class="card"><div class="card-t">Lot Recommendation</div>
-      <div class="tac" style="padding:10px 0"><div style="font-size:28px;font-weight:700;color:${reg.c}">${lots.rec.toFixed(2)}</div>
-      <div class="dim" style="font-size:10px;margin-top:4px">lots per position</div></div>
-      <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${lots.pct}%;background:${reg.c}"></div></div>
-      <div class="fxb dim" style="font-size:9px;margin-top:2px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
-    </div>`;
-
-    // Cushion math
-    h += `<div class="card"><div class="card-t">Cushion Breakdown</div><div class="mg mg2">
-      <div class="m"><div class="m-l">Total Cushion</div><div class="m-v pos">$${lots.cushion.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Per Pair</div><div class="m-v">$${lots.perPair.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Hard Gate (÷$100)</div><div class="m-v">${lots.hardMax.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">Tier Gate (÷$150)</div><div class="m-v">${lots.tierMax.toFixed(2)}</div></div>
-    </div></div>`;
+  switch(reg.r) {
+    case 'PRIME':
+      msg = 'All gates clear. Conditions are prime for scaling.';
+      if (lots) msg += ' Lot recommendation: ' + lots.rec.toFixed(2);
+      break;
+    case 'NORMAL':
+      msg = 'Operating normally. Not yet clear for scaling.';
+      if (reg.primeBlockers && reg.primeBlockers.length > 0) {
+        // Find the closest-to-flipping blocker (shortest string = simplest = closest)
+        blockerStr = reg.primeBlockers.slice(0, 3).join(' · ');
+      }
+      break;
+    case 'CAUTION':
+      msg = 'Elevated risk detected.';
+      if (reg.reasons && reg.reasons.length > 0) {
+        blockerStr = reg.reasons.slice(0, 3).join(' · ');
+      }
+      break;
+    case 'DEFENSIVE':
+      msg = 'Defensive mode — protecting capital. Lot locked at 0.01.';
+      break;
+    default:
+      msg = 'System offline.';
   }
 
-  // Regime gates summary
-  h += `<div class="card"><div class="card-t">Gate Status</div>`;
-  const D = S.data.daily || [];
-  const pnl7d = calc7dPnl(D);
-  const rfVal = calcRF(D);
-  const streak = calcLossStreak(D);
-
-  const gates = [
-    { name: '7d Net P&L', val: '$' + pnl7d.toFixed(2), pass: pnl7d > 0 },
-    { name: 'Recovery Factor', val: rfVal >= 99 ? '∞' : rfVal.toFixed(1), pass: rfVal >= 1.5 },
-    { name: 'Loss Streak', val: streak + ' days', pass: streak < 4 },
-  ];
-
-  if (L.pairs) {
-    for (const p of L.pairs) {
-      const adxPct = p.adxR > 0 ? (p.adx / p.adxR * 100) : 0;
-      const grid = Math.max(p.buyN||0, p.sellN||0);
-      gates.push({ name: p.n + ' ADX', val: adxPct.toFixed(0) + '%', pass: adxPct < 70 });
-      gates.push({ name: p.n + ' ATR', val: p.atrR.toFixed(2) + 'x', pass: p.atrR < 1.1 });
-      gates.push({ name: p.n + ' Grid', val: grid.toString(), pass: grid <= 4 });
-    }
-  }
-
-  for (const g of gates) {
-    const col = g.pass ? 'var(--grn)' : 'var(--red)';
-    h += `<div class="row"><span class="row-l">${g.name}</span>
-      <span><span class="row-v" style="margin-right:6px">${g.val}</span>
-      <span class="pill" style="background:${col}22;color:${col}">${g.pass ? 'PASS' : 'FAIL'}</span></span></div>`;
-  }
-  h += '</div>';
-
-  el.innerHTML = h;
+  return `<div class="action-bar" style="background:${reg.c}${bgAlpha};border:1px solid ${reg.c}${borderAlpha}">
+    <div class="label" style="color:${reg.c}">${reg.r}</div>
+    <div class="msg">${msg}</div>
+    ${blockerStr ? '<div class="blockers">' + blockerStr + '</div>' : ''}
+  </div>`;
 }
 
 // ============================================================
@@ -584,187 +645,104 @@ function renderPairs() {
   if (!L.pairs) { el.innerHTML = '<div class="tac dim" style="padding:40px">No pair data</div>'; return; }
 
   for (const p of L.pairs) {
-    // Collect daily history for this pair
     const pDaily = D.filter(d => d.pair === p.n);
     const totalPnl = pDaily.reduce((s,d) => s + (d.pnl||0), 0);
-    const totalWins = pDaily.reduce((s,d) => s + (d.wins||0), 0);
-    const totalLosses = pDaily.reduce((s,d) => s + (d.losses||0), 0);
-    const totalClosed = totalWins + totalLosses;
-    const winRate = totalClosed > 0 ? (totalWins / totalClosed * 100) : 0;
     const daysActive = new Set(pDaily.map(d => d.date)).size;
     const dailyRate = daysActive > 0 ? totalPnl / daysActive : 0;
-    const totalBlkPnl = pDaily.reduce((s,d) => s + (d.blkPnl||0), 0);
-    const totalBlkClosed = pDaily.reduce((s,d) => s + (d.blkClosed||0), 0);
-    const grossPos = pDaily.reduce((s,d) => s + (d.pnl > 0 ? d.pnl : 0), 0);
-    const blockCostRatio = grossPos > 0 ? (Math.abs(totalBlkPnl) / grossPos * 100) : 0;
-
-    // Today's stats
     const today = L.day || '';
     const todayData = pDaily.find(d => d.date === today);
     const todayPnl = todayData ? todayData.pnl : 0;
 
+    const cond = pairCondition(p);
     const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
-    const grid = Math.max(p.buyN||0, p.sellN||0);
     const adxCol = adxPct >= 0.8 ? 'var(--red)' : adxPct >= 0.7 ? 'var(--amb)' : 'var(--grn)';
+    const h1Bull = (p.diP||0) > (p.diM||0);
+    const emaBull = p.emaBull;
+    const maxDepth = Math.max(p.buyDepth||0, p.sellDepth||0);
+    const maxAge = Math.max(p.oldBuyAge||0, p.oldSellAge||0);
+    const prcPct = p.prcPct || 50;
+    const rsi = p.rsi || 50;
+    const swap = p.swap || 0;
+
+    // Expectancy
+    const exp = calcExpectancy(pDaily, null);
 
     h += `<div class="pcard">
       <div class="pcard-hdr">
         <span class="pcard-name">${p.n}</span>
-        <span class="pill" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
+        <span class="cond" style="background:${cond.col}22;color:${cond.col}">${cond.label}</span>
+      </div>`;
+
+    // Badges row
+    h += `<div class="badge">
+      <span class="bdg" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
+      ${(p.adxH4||0) > 20 ? '<span class="bdg" style="background:var(--cyn2);color:var(--cyn)">H4:' + (p.adxH4||0).toFixed(0) + '</span>' : ''}
+      <span class="bdg" style="background:var(--sf2);color:${emaBull ? 'var(--grn)' : 'var(--red)'}">${emaBull ? '▲ BULL' : '▼ BEAR'}</span>
+      <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
+      ${swap < -0.01 ? '<span class="bdg" style="background:var(--amb2);color:var(--amb)">SWAP $' + swap.toFixed(2) + '</span>' : ''}
+    </div>`;
+
+    // P&L row
+    h += `<div class="mg mg3 mt4">
+      <div class="m"><div class="m-l">Float</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Today</div><div class="m-v ${todayPnl>=0?'pos':'neg'}">$${todayPnl.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Total</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
+    </div>`;
+
+    // Grid + indicators row
+    h += `<div class="mg mg4 mt4">
+      <div class="m"><div class="m-l">Depth</div><div class="m-v ${maxDepth>50?'neg':maxDepth>20?'warn':''}">${maxDepth > 0 ? maxDepth.toFixed(0)+'p' : '—'}</div></div>
+      <div class="m"><div class="m-l">RSI</div><div class="m-v ${rsi>70?'neg':rsi<30?'neg':''}">${rsi.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">$/day</div><div class="m-v ${dailyRate>=0?'pos':'neg'}">${dailyRate.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Grid</div><div class="m-v">${p.buyN||0}B/${p.sellN||0}S</div></div>
+    </div>`;
+
+    // Price percentile bar
+    h += `<div style="margin:6px 0">
+      <div class="fxb" style="font-size:9px;color:var(--dim)"><span>20d Low</span><span>Price Position</span><span>20d High</span></div>
+      <div class="pctl-bar"><div class="pctl-dot" style="left:${prcPct}%"></div></div>
+    </div>`;
+
+    // Stuck grid + age warning
+    if (maxAge > 360) {
+      const hrs = Math.floor(maxAge/60);
+      const side = (p.oldBuyAge||0) >= (p.oldSellAge||0) ? 'Buy' : 'Sell';
+      h += `<div class="dim" style="font-size:9px;margin-top:2px">⏱ ${side} grid open ${hrs}h</div>`;
+    }
+
+    // Daily range consumed
+    const rngPct = p.rngPct || 0;
+    if (rngPct > 0) {
+      h += `<div class="fxb dim mt4" style="font-size:9px">
+        <span>Daily range: ${rngPct.toFixed(0)}% consumed</span>
+        <span>${daysActive}d active</span>
+      </div>`;
+    }
+
+    h += `</div>`;
+  }
+
+  // Expectancy card (all pairs combined)
+  const allExp = calcExpectancy(D);
+  if (allExp) {
+    h += `<div class="card"><div class="card-t">Strategy Expectancy</div>
+      <div class="mg mg3">
+        <div class="m"><div class="m-l">Expectancy</div><div class="m-v ${allExp.exp>=0?'pos':'neg'}">$${allExp.exp.toFixed(3)}</div></div>
+        <div class="m"><div class="m-l">Profit Factor</div><div class="m-v">${allExp.pf>=99?'∞':allExp.pf.toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">Win Rate</div><div class="m-v">${(allExp.winRate*100).toFixed(0)}%</div></div>
       </div>
-      <div class="badge">
-        <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
-        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Grid ${grid}</span>
-        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Spd ${p.spd.toFixed(0)}</span>
-        ${p.fb ? '<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT BRK</span>' : ''}
-      </div>
-      <div class="mg mg3 mt4">
-        <div class="m"><div class="m-l">Float P&L</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">Today</div><div class="m-v ${todayPnl>=0?'pos':'neg'}">$${todayPnl.toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">All Time</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
-      </div>
-      <div class="mg mg4 mt4">
-        <div class="m"><div class="m-l">Win%</div><div class="m-v">${winRate.toFixed(0)}%</div></div>
-        <div class="m"><div class="m-l">$/day</div><div class="m-v ${dailyRate>=0?'pos':'neg'}">${dailyRate.toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">Blk Cost</div><div class="m-v">${blockCostRatio.toFixed(0)}%</div></div>
-        <div class="m"><div class="m-l">Trades</div><div class="m-v">${totalClosed}</div></div>
-      </div>
-      <div class="fxb dim mt4" style="font-size:9px">
-        <span>${daysActive} days active</span>
-        <span>Blk: ${totalBlkClosed} ($${totalBlkPnl.toFixed(2)})</span>
-      </div>
+      <div class="dim" style="font-size:8px;margin-top:2px">From grossWin/grossLoss — real trade-level data</div>
     </div>`;
   }
 
-  // Retired pairs
-  if (D.length > 0 && L.pairs) {
-    const activePairs = new Set(L.pairs.map(p => p.n));
-    const allPairs = new Set(D.map(d => d.pair));
-    const retired = [...allPairs].filter(p => !activePairs.has(p));
-    if (retired.length > 0) {
-      h += `<div class="card"><div class="card-t">Retired Pairs</div>`;
-      for (const rp of retired) {
-        const rpDaily = D.filter(d => d.pair === rp);
-        const rpPnl = rpDaily.reduce((s,d) => s + (d.pnl||0), 0);
-        const rpDays = new Set(rpDaily.map(d => d.date)).size;
-        h += `<div class="row"><span class="row-l">${rp} <span class="dim">(${rpDays}d)</span></span>
-          <span class="row-v ${rpPnl>=0?'pos':'neg'}">$${rpPnl.toFixed(2)}</span></div>`;
-      }
-      h += '</div>';
-    }
-  }
-
   el.innerHTML = h;
 }
 
 // ============================================================
-// MANAGER tab
+// P&L tab
 // ============================================================
-function renderMgr() {
-  const el = document.getElementById('p-mgr');
-  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
-  const L = S.data.latest;
-  const tm = L.tm || {};
-  const D = S.data.daily || [];
-  let h = '';
-
-  // TM status
-  h += `<div class="card"><div class="card-t">Trade Manager</div>
-    <div class="mg mg2">
-      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active ? 'Online' : 'Offline'}</div></div>
-      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def ? 'DEFENSIVE' : 'Normal'}</div></div>
-    </div>
-    <div class="mg mg4">
-      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
-      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
-      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
-      <div class="m"><div class="m-l">Float Blk</div><div class="m-v">${tm.dayF||0}</div></div>
-    </div>
-  </div>`;
-
-  // TM config
-  h += `<div class="card"><div class="card-t">TM Config</div>
-    <div class="row"><span class="row-l">DD Soft Limit</span><span class="row-v">${tm.ddSoft||15}%</span></div>
-    <div class="row"><span class="row-l">Defensive DD</span><span class="row-v">${tm.defDD||10}%</span></div>
-    <div class="row"><span class="row-l">Max Trades</span><span class="row-v">${tm.maxT||50}</span></div>
-    <div class="row"><span class="row-l">Equity Floor</span><span class="row-v">$${L.acct.floor.toFixed(0)}</span></div>
-  </div>`;
-
-  // Strategy metrics
-  const pnl7d = calc7dPnl(D);
-  const rfVal = calcRF(D);
-  const streak = calcLossStreak(D);
-  const totalPnl = D.reduce((s,d) => s + (d.pnl||0), 0);
-  const totalDays = new Set(D.map(d => d.date)).size;
-
-  // Daily PF (approx)
-  const posDays = D.reduce((s,d) => { const byDate = {}; return s; }, 0);
-  let grossWinDays = 0, grossLossDays = 0;
-  const byDate = {};
-  for (const d of D) { byDate[d.date] = (byDate[d.date]||0) + (d.pnl||0); }
-  for (const dt of Object.keys(byDate)) {
-    if (byDate[dt] > 0) grossWinDays += byDate[dt];
-    else grossLossDays += Math.abs(byDate[dt]);
-  }
-  const dailyPF = grossLossDays > 0 ? grossWinDays / grossLossDays : (grossWinDays > 0 ? 99 : 0);
-
-  h += `<div class="card"><div class="card-t">Strategy Metrics</div>
-    <div class="mg mg3">
-      <div class="m"><div class="m-l">Total P&L</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">$/day avg</div><div class="m-v">${totalDays>0?(totalPnl/totalDays).toFixed(2):'--'}</div></div>
-    </div>
-    <div class="mg mg3">
-      <div class="m"><div class="m-l">Daily PF*</div><div class="m-v">${dailyPF>=99?'∞':dailyPF.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">RF</div><div class="m-v">${rfVal>=99?'∞':rfVal.toFixed(1)}</div></div>
-      <div class="m"><div class="m-l">Loss Streak</div><div class="m-v ${streak>=4?'neg':''}">${streak}d</div></div>
-    </div>
-    <div class="dim" style="font-size:8px;margin-top:4px">*Daily PF is approximate — uses daily net P&L, not trade-level gross win/loss</div>
-  </div>`;
-
-  // Per-pair ADX status
-  if (L.pairs) {
-    h += `<div class="card"><div class="card-t">ADX Status</div>`;
-    for (const p of L.pairs) {
-      const diMax = Math.max(p.diP||0, p.diM||0);
-      const trend = (p.diP||0) > (p.diM||0) ? 'UP' : 'DN';
-      const trendCol = trend === 'UP' ? 'var(--grn)' : 'var(--red)';
-      const pct = p.adxR > 0 ? (p.adx / p.adxR * 100) : 0;
-      h += `<div class="row"><div>
-        <span style="font-weight:600">${p.n}</span>
-        <span class="dim" style="font-size:9px;margin-left:4px">DI+ ${(p.diP||0).toFixed(0)} / DI- ${(p.diM||0).toFixed(0)}</span>
-      </div><div class="fx gap4" style="align-items:center">
-        <span style="color:${trendCol};font-weight:700;font-size:10px">${trend}</span>
-        <span class="row-v">${p.adx.toFixed(0)}<span class="dim">/${p.adxR}</span></span>
-        <span class="dim" style="font-size:9px">(${pct.toFixed(0)}%)</span>
-        ${p.brk ? '<span class="bdg" style="background:var(--amb2);color:var(--amb)">BRK</span>' : ''}
-      </div></div>`;
-    }
-    h += '</div>';
-  }
-
-  // Block cost ratio per pair
-  if (L.pairs && D.length > 0) {
-    h += `<div class="card"><div class="card-t">Block Cost Ratio</div>`;
-    for (const p of L.pairs) {
-      const pDaily = D.filter(d => d.pair === p.n);
-      const blkPnl = pDaily.reduce((s,d) => s + Math.abs(d.blkPnl||0), 0);
-      const grossPos = pDaily.reduce((s,d) => s + (d.pnl > 0 ? d.pnl : 0), 0);
-      const ratio = grossPos > 0 ? (blkPnl / grossPos * 100) : 0;
-      h += `<div class="row"><span class="row-l">${p.n}</span>
-        <span class="row-v ${ratio>20?'neg':ratio>10?'warn':''}">${ratio.toFixed(1)}%</span></div>`;
-    }
-    h += '<div class="dim" style="font-size:8px;margin-top:4px">|blocked P&L| ÷ gross positive P&L — lower is better</div></div>';
-  }
-
-  el.innerHTML = h;
-}
-
-// ============================================================
-// HISTORY tab
-// ============================================================
-function renderHist() {
-  const el = document.getElementById('p-hist');
+function renderPnl() {
+  const el = document.getElementById('p-pnl');
   if (!S.data) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
   const D = S.data.daily || [];
   const snaps = S.data.snapshots || [];
@@ -772,12 +750,17 @@ function renderHist() {
 
   // Running total
   const totalPnl = D.reduce((s,d) => s + (d.pnl||0), 0);
-  h += `<div class="card"><div class="fxb">
-    <div><div class="card-t" style="margin:0">Running Total</div></div>
-    <div class="m-v ${totalPnl>=0?'pos':'neg'}" style="font-size:20px">$${totalPnl.toFixed(2)}</div>
+  const totalDays = new Set(D.map(d => d.date)).size;
+  const dailyAvg = totalDays > 0 ? totalPnl / totalDays : 0;
+  const pnl7d = calc7dPnl(D);
+
+  h += `<div class="card"><div class="mg mg3">
+    <div class="m"><div class="m-l">All Time</div><div class="m-v ${totalPnl>=0?'pos':'neg'}" style="font-size:18px">$${totalPnl.toFixed(2)}</div></div>
+    <div class="m"><div class="m-l">7 Day</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
+    <div class="m"><div class="m-l">$/day</div><div class="m-v ${dailyAvg>=0?'pos':'neg'}">${dailyAvg.toFixed(2)}</div></div>
   </div></div>`;
 
-  // Equity chart from snapshots
+  // Equity chart
   if (snaps.length > 2) {
     h += `<div class="card"><div class="card-t">Equity (${snaps.length} snapshots)</div>
       <div class="chart-wrap">${renderEquityChart(snaps)}</div></div>`;
@@ -793,9 +776,22 @@ function renderHist() {
       <div class="chart-wrap">${renderDailyBars(dates, byDate)}</div></div>`;
   }
 
+  // Per-pair daily breakdown
+  if (D.length > 0 && S.data.latest && S.data.latest.pairs) {
+    h += `<div class="card"><div class="card-t">Per Pair</div>`;
+    for (const p of S.data.latest.pairs) {
+      const pDaily = D.filter(d => d.pair === p.n);
+      const pPnl = pDaily.reduce((s,d) => s + (d.pnl||0), 0);
+      const pDays = new Set(pDaily.map(d => d.date)).size;
+      h += `<div class="row"><span class="row-l">${p.n} <span class="dim">(${pDays}d)</span></span>
+        <span class="row-v ${pPnl>=0?'pos':'neg'}">$${pPnl.toFixed(2)}</span></div>`;
+    }
+    h += '</div>';
+  }
+
   // Daily table (collapsible)
   if (dates.length > 0) {
-    h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Daily Table (${dates.length}d)</div>
+    h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Daily Detail (${dates.length}d)</div>
       <button class="coll-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Hide':'Show'">Show</button></div>
       <div class="coll-body">`;
     for (const dt of [...dates].reverse()) {
@@ -817,29 +813,29 @@ function renderHist() {
 }
 
 // ============================================================
-// Charts (SVG)
+// Charts
 // ============================================================
 function renderSparkline() {
   if (!S.data || !S.data.snapshots || S.data.snapshots.length < 3) return '';
-  const snaps = S.data.snapshots.slice(-60); // last ~3 hours
+  const snaps = S.data.snapshots.slice(-60);
   const eqs = snaps.map(s => s.eq);
   const min = Math.min(...eqs) * 0.999;
   const max = Math.max(...eqs) * 1.001;
-  const w = 300, h = 30;
+  const w = 300, ht = 30;
   const pts = eqs.map((v, i) => {
     const x = (i / (eqs.length - 1)) * w;
-    const y = h - ((v - min) / (max - min)) * h;
+    const y = ht - ((v - min) / (max - min)) * ht;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:30px;margin-top:6px">
+  return `<svg viewBox="0 0 ${w} ${ht}" style="width:100%;height:30px;margin-top:6px">
     <polyline points="${pts}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/>
   </svg>`;
 }
 
 function renderEquityChart(snaps) {
   const W = 340, H = 120, P = 25;
-  const bals = snaps.map(s => s.bal);
   const eqs = snaps.map(s => s.eq);
+  const bals = snaps.map(s => s.bal);
   const all = [...bals, ...eqs];
   const min = Math.min(...all) * 0.998;
   const max = Math.max(...all) * 1.002;
@@ -853,7 +849,6 @@ function renderEquityChart(snaps) {
     }).join(' ');
   }
 
-  // Y-axis labels
   const steps = 4;
   let labels = '';
   for (let i = 0; i <= steps; i++) {
@@ -888,25 +883,135 @@ function renderDailyBars(dates, byDate) {
     bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${Math.max(1,barH).toFixed(1)}" fill="${col}" rx="1"/>`;
   }
 
-  // Zero line
-  const labels = `<line x1="${P}" y1="${mid}" x2="${W-P}" y2="${mid}" stroke="var(--mt)" stroke-width="0.5"/>
+  const lbls = `<line x1="${P}" y1="${mid}" x2="${W-P}" y2="${mid}" stroke="var(--mt)" stroke-width="0.5"/>
     <text x="${P-4}" y="${mid+3}" fill="var(--mt)" font-size="8" text-anchor="end">$0</text>
     <text x="${P-4}" y="12" fill="var(--mt)" font-size="8" text-anchor="end">+$${maxAbs.toFixed(0)}</text>
     <text x="${P-4}" y="${H-2}" fill="var(--mt)" font-size="8" text-anchor="end">-$${maxAbs.toFixed(0)}</text>`;
 
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100px">${labels}${bars}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100px">${lbls}${bars}</svg>`;
 }
 
 // ============================================================
-// Settings (disconnect)
+// Demo Mode
 // ============================================================
-function disconnect() {
-  localStorage.removeItem('tm_url');
-  S.url = '';
-  S.data = null;
-  clearTimeout(S.timer);
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('connectScreen').classList.remove('hidden');
+function loadDemo() {
+  const now = new Date();
+  const ts = now.toISOString().replace('T',' ').substring(0,19);
+  const day = now.toISOString().substring(0,10).replace(/-/g,'.');
+
+  S.data = {
+    status: 'ok',
+    latest: {
+      ts, day,
+      acct: { bal:512.38, eq:507.14, dd:4.2, peak:518.60, floor:300, margin:12.40, baseLots:0.01 },
+      tm: { active:true, def:false, ddSoft:15, defDD:10, maxT:50, dayA:18, dayB:3, dayC:1, dayF:0, kill:false },
+      totalOpen: 9,
+      session: 'London',
+      hour: 10, dow: 3,
+      eurCorr: false,
+      pairs: [
+        {
+          n:'EURUSD', adx:22.4, adxR:30, diP:18.1, diM:14.3, brk:false,
+          adxSlp:-0.8, adxH4:19.2, diPH4:16.5, diMH4:13.8,
+          rsi:54.2, bbw:0.0042, emaBull:true, atrR:0.92,
+          rngPct:62, prcPct:58, tickVol:1840, spd:1.2,
+          buyN:2, sellN:1, buyLot:0.02, sellLot:0.01,
+          buyDepth:12.4, sellDepth:5.8, oldBuyAge:185, oldSellAge:42,
+          buyVel:0, sellVel:0, floatPnl:-2.18, swap:-0.04,
+          fb:false, cdB:false, cdS:false
+        },
+        {
+          n:'EURGBP', adx:18.6, adxR:30, diP:12.4, diM:15.9, brk:false,
+          adxSlp:0.3, adxH4:14.1, diPH4:11.2, diMH4:13.6,
+          rsi:42.8, bbw:0.0031, emaBull:false, atrR:0.78,
+          rngPct:44, prcPct:35, tickVol:920, spd:1.8,
+          buyN:1, sellN:0, buyLot:0.01, sellLot:0,
+          buyDepth:8.2, sellDepth:0, oldBuyAge:95, oldSellAge:0,
+          buyVel:0, sellVel:0, floatPnl:-0.86, swap:0,
+          fb:false, cdB:false, cdS:false
+        },
+        {
+          n:'GBPAUD', adx:31.5, adxR:40, diP:24.8, diM:16.2, brk:false,
+          adxSlp:1.4, adxH4:28.3, diPH4:22.1, diMH4:14.5,
+          rsi:64.8, bbw:0.0098, emaBull:true, atrR:1.08,
+          rngPct:71, prcPct:72, tickVol:2450, spd:3.1,
+          buyN:1, sellN:4, buyLot:0.01, sellLot:0.04,
+          buyDepth:0, sellDepth:38.6, oldBuyAge:28, oldSellAge:520,
+          buyVel:0, sellVel:1, floatPnl:-5.24, swap:-0.18,
+          fb:false, cdB:false, cdS:false
+        }
+      ],
+      trades: [
+        { pr:'EURUSD', ty:'B', lt:0.01, pl:-1.42, op:1.08420, dur:185, sl:1.07920 },
+        { pr:'EURUSD', ty:'B', lt:0.01, pl:-0.76, op:1.08544, dur:88, sl:1.08044 },
+        { pr:'EURUSD', ty:'S', lt:0.01, pl:0.34, op:1.08610, dur:42, sl:1.09110 },
+        { pr:'EURGBP', ty:'B', lt:0.01, pl:-0.86, op:0.85620, dur:95, sl:0.85120 },
+        { pr:'GBPAUD', ty:'B', lt:0.01, pl:1.12, op:1.94280, dur:28, sl:0 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-0.82, op:1.94680, dur:520, sl:1.95880 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-1.64, op:1.95040, dur:410, sl:1.96240 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-2.18, op:1.95380, dur:290, sl:1.96580 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-0.60, op:1.94820, dur:155, sl:1.96020 },
+      ]
+    },
+    snapshots: generateDemoSnapshots(now),
+    daily: generateDemoDaily(now)
+  };
+  S.indicators = [];
+  S.err = null;
+  showDashboard();
+  render();
+}
+
+function generateDemoSnapshots(now) {
+  const snaps = [];
+  const baseEq = 502, baseBal = 510;
+  for (let i = 480; i >= 0; i--) { // ~24h at 3min intervals
+    const t = new Date(now.getTime() - i * 180000);
+    const noise = Math.sin(i * 0.05) * 4 + Math.random() * 3 - 1.5;
+    const trend = (480 - i) * 0.01;
+    const eq = baseEq + noise + trend;
+    const bal = baseBal + trend + (Math.random() > 0.85 ? 0.2 : 0);
+    snaps.push({
+      ts: t.toISOString().replace('T',' ').substring(0,19),
+      bal: parseFloat(bal.toFixed(2)),
+      eq: parseFloat(eq.toFixed(2)),
+      dd: parseFloat((Math.max(0, (bal - eq) / bal * 100)).toFixed(2)),
+      trades: 6 + Math.floor(Math.random() * 6),
+      def: 0
+    });
+  }
+  return snaps;
+}
+
+function generateDemoDaily(now) {
+  const pairs = ['EURUSD','EURGBP','GBPAUD'];
+  const daily = [];
+  for (let d = 13; d >= 0; d--) {
+    const dt = new Date(now.getTime() - d * 86400000);
+    const dateStr = dt.toISOString().substring(0,10).replace(/-/g,'.');
+    for (const pair of pairs) {
+      const base = pair === 'EURUSD' ? 0.6 : pair === 'EURGBP' ? 0.35 : 0.25;
+      const variance = (Math.random() - 0.4) * 1.5;
+      const pnl = parseFloat((base + variance).toFixed(2));
+      const wins = 3 + Math.floor(Math.random() * 8);
+      const losses = 1 + Math.floor(Math.random() * 4);
+      const gWin = parseFloat((wins * (0.15 + Math.random() * 0.12)).toFixed(2));
+      const gLoss = parseFloat((losses * (0.08 + Math.random() * 0.10)).toFixed(2));
+      const blkC = Math.random() > 0.7 ? Math.floor(Math.random() * 3) : 0;
+      const blkPnl = blkC > 0 ? parseFloat((-blkC * (0.05 + Math.random() * 0.08)).toFixed(2)) : 0;
+      daily.push({
+        date: dateStr, pair,
+        pnl, wins, losses, closed: wins + losses,
+        avgDur: 30 + Math.floor(Math.random() * 120),
+        blkClosed: blkC, blkPnl,
+        bal: 500 + (13 - d) * 0.9,
+        eq: 498 + (13 - d) * 0.85,
+        peak: 500 + (13 - d) * 0.95,
+        grossWin: gWin, grossLoss: gLoss
+      });
+    }
+  }
+  return daily;
 }
 </script>
 </body>
