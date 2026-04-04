@@ -12,6 +12,7 @@
   --amb:#f59e0b;--amb2:rgba(245,158,11,.12);--ambB:rgba(245,158,11,.3);
   --red:#ef4444;--red2:rgba(239,68,68,.12);--redB:rgba(239,68,68,.3);
   --blu:#3b82f6;--blu2:rgba(59,130,246,.1);--bluB:rgba(59,130,246,.3);
+  --cyn:#06b6d4;--cyn2:rgba(6,182,212,.12);--cynB:rgba(6,182,212,.3);
   --r:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -19,7 +20,7 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
   max-width:1200px;margin:0 auto;min-height:100vh;font-size:12px;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 
-/* Top strip — always visible */
+/* Top strip */
 .strip{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--bd);padding:8px 20px;
   display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .strip-title{font-size:14px;font-weight:700;letter-spacing:.5px}
@@ -30,6 +31,7 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .strip-metrics .val{font-weight:700}
 .strip-right{display:flex;gap:10px;align-items:center}
 .pill{display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:.4px}
+.session-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;background:var(--cyn2);color:var(--cyn);letter-spacing:.3px}
 .btn-sm{background:var(--sf2);border:1px solid var(--bd);color:var(--dim);font:inherit;font-size:10px;
   padding:4px 10px;border-radius:5px;cursor:pointer}
 .btn-sm:hover{border-color:var(--mt)}
@@ -39,6 +41,7 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .tab{padding:8px 16px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.5px;
   color:var(--mt);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
 .tab.on{color:var(--blu);border-bottom-color:var(--blu)}
+.tab.placeholder{color:var(--bd);cursor:default}
 
 /* Content */
 .pane{display:none;padding:16px 20px 60px}
@@ -61,6 +64,12 @@ body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','Jet
 .m-l{font-size:9px;color:var(--dim);margin-bottom:2px}
 .m-v{font-size:16px;font-weight:600}
 
+/* Action bar */
+.action-bar{border-radius:var(--r);padding:12px 16px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.action-bar .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.action-bar .msg{font-weight:500}
+.action-bar .blockers{font-size:11px;color:var(--dim);margin-top:4px}
+
 /* Regime */
 .regime{border-radius:var(--r);padding:10px 14px;margin-bottom:12px;text-align:center;font-weight:700;font-size:14px;letter-spacing:1px}
 
@@ -70,6 +79,7 @@ th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter
   padding:6px 8px;border-bottom:1px solid var(--bd)}
 td{padding:6px 8px;border-bottom:1px solid var(--bd)}
 tr:hover{background:var(--sf2)}
+.tar{text-align:right}
 
 /* Row */
 .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
@@ -86,32 +96,43 @@ tr:hover{background:var(--sf2)}
 .badge{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
 .bdg{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
 
+/* Condition badge */
+.cond{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:.3px}
+
 /* Progress bar */
 .pbar{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;margin:4px 0}
 .pbar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* Percentile bar */
+.pctl-bar{position:relative;height:10px;background:linear-gradient(90deg,var(--red2),var(--sf2) 30%,var(--sf2) 70%,var(--red2));border-radius:5px;margin:4px 0}
+.pctl-dot{position:absolute;top:0;width:10px;height:10px;border-radius:50%;background:var(--tx);border:2px solid var(--blu);transform:translateX(-50%)}
+
+/* Gauge (for indicators) */
+.gauge{display:flex;align-items:center;gap:8px;margin:4px 0}
+.gauge-bar{flex:1;height:8px;background:var(--sf2);border-radius:4px;overflow:hidden;position:relative}
+.gauge-fill{height:100%;border-radius:4px;transition:width .3s}
+.gauge-label{font-size:10px;color:var(--dim);width:60px}
+.gauge-val{font-size:11px;font-weight:600;width:50px;text-align:right}
 
 /* Chart */
 .chart-wrap{background:var(--sf2);border-radius:6px;padding:10px;margin:6px 0}
 svg text{font-family:inherit}
 
 /* Alert */
-.alert{border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:11px;display:flex;gap:8px;align-items:center}
+.alert{border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:11px;display:flex;gap:8px;align-items:flex-start}
+.alert-icon{font-size:14px;flex-shrink:0;line-height:1}
+
+/* Collapsible */
+.coll-btn{background:none;border:none;color:var(--dim);font:inherit;font-size:10px;
+  padding:4px 8px;cursor:pointer}
+.coll-body{display:none}
+.coll-body.open{display:block}
 
 /* Filters */
 .filters{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 select,input[type="date"]{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);font:inherit;font-size:11px;
   padding:4px 8px;border-radius:5px}
 select:focus,input:focus{outline:none;border-color:var(--blu)}
-
-/* Modal */
-.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;width:360px;max-width:90vw}
-.modal h3{font-size:13px;margin-bottom:12px}
-.modal input{width:100%;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);font:inherit;font-size:12px;
-  padding:8px;border-radius:5px;margin-bottom:8px}
-.modal button{background:var(--blu);color:#fff;border:none;font:inherit;font-weight:700;font-size:11px;
-  padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:6px}
-.modal .btn-cancel{background:var(--sf2);color:var(--dim);border:1px solid var(--bd)}
 
 /* Connect */
 .connect{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -124,10 +145,15 @@ select:focus,input:focus{outline:none;border-color:var(--blu)}
 .connect button{background:var(--blu);color:#fff;border:none;border-radius:6px;
   font:inherit;font-weight:700;font-size:12px;padding:10px 30px;cursor:pointer}
 
+/* Lab placeholder */
+.lab-placeholder{text-align:center;padding:60px 20px;color:var(--mt)}
+.lab-placeholder h3{font-size:16px;margin-bottom:12px;color:var(--dim)}
+.lab-placeholder p{font-size:11px;line-height:1.6;max-width:500px;margin:0 auto 8px}
+
 /* Utility */
 .neg{color:var(--red)}.pos{color:var(--grn)}.warn{color:var(--amb)}
-.dim{color:var(--dim)}.mt4{margin-top:4px}.mt8{margin-top:8px}.mb4{margin-bottom:4px}
-.tac{text-align:center}.tar{text-align:right}
+.dim{color:var(--dim)}.mt4{margin-top:4px}.mt8{margin-top:8px}.mb4{margin-bottom:4px}.mb8{margin-bottom:8px}
+.tac{text-align:center}
 .fx{display:flex}.fxb{display:flex;justify-content:space-between;align-items:center}
 .gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}
 .f1{flex:1}
@@ -142,24 +168,29 @@ select:focus,input:focus{outline:none;border-color:var(--blu)}
     <p>Paste your Google Apps Script URL to connect</p>
     <input id="urlInput" placeholder="https://script.google.com/macros/s/.../exec" spellcheck="false">
     <button onclick="saveUrl()">Connect</button>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);width:400px;max-width:90vw">
+      <p style="font-size:10px;color:var(--mt);margin-bottom:8px">Or preview with sample data</p>
+      <button onclick="loadDemo()" style="background:var(--sf2);border:1px solid var(--bd);color:var(--dim);border-radius:6px;font:inherit;font-weight:700;font-size:12px;padding:10px 30px;cursor:pointer">Demo Mode</button>
+    </div>
   </div>
 
   <div id="dashboard" class="hidden">
     <div class="strip" id="strip"></div>
     <div class="tabs" id="tabBar">
-      <div class="tab on" data-t="live">LIVE</div>
-      <div class="tab" data-t="lots">LOT SIZING</div>
+      <div class="tab on" data-t="overview">OVERVIEW</div>
       <div class="tab" data-t="pairs">PAIRS</div>
-      <div class="tab" data-t="mgr">MANAGER</div>
-      <div class="tab" data-t="hist">HISTORY</div>
+      <div class="tab" data-t="market">MARKET</div>
+      <div class="tab" data-t="strategy">STRATEGY</div>
+      <div class="tab" data-t="history">HISTORY</div>
+      <div class="tab placeholder" data-t="lab">LAB</div>
     </div>
-    <div class="pane on" id="p-live"></div>
-    <div class="pane" id="p-lots"></div>
+    <div class="pane on" id="p-overview"></div>
     <div class="pane" id="p-pairs"></div>
-    <div class="pane" id="p-mgr"></div>
-    <div class="pane" id="p-hist"></div>
+    <div class="pane" id="p-market"></div>
+    <div class="pane" id="p-strategy"></div>
+    <div class="pane" id="p-history"></div>
+    <div class="pane" id="p-lab"></div>
   </div>
-  <div id="modal"></div>
 </div>
 
 <script>
@@ -169,9 +200,10 @@ select:focus,input:focus{outline:none;border-color:var(--blu)}
 const S = {
   url: localStorage.getItem('tm_url') || '',
   data: null,
+  indicators: null,
   err: null,
   loading: false,
-  tab: 'live',
+  tab: 'overview',
   refreshMs: 180000,
   timer: null,
   pairFilter: 'all',
@@ -179,15 +211,13 @@ const S = {
 };
 
 if (S.url) { showDashboard(); fetchData(); }
-else document.getElementById('connectScreen').classList.remove('hidden');
+else { document.getElementById('connectScreen').classList.remove('hidden'); loadDemo(); }
 
 function saveUrl() {
   const v = document.getElementById('urlInput').value.trim();
   if (v.length < 10) return;
-  S.url = v;
-  localStorage.setItem('tm_url', v);
-  showDashboard();
-  fetchData();
+  S.url = v; localStorage.setItem('tm_url', v);
+  showDashboard(); fetchData();
 }
 
 function showDashboard() {
@@ -195,581 +225,873 @@ function showDashboard() {
   document.getElementById('dashboard').classList.remove('hidden');
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
+      if (t.classList.contains('placeholder')) return;
       document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
       document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
-      t.classList.add('on');
-      S.tab = t.dataset.t;
+      t.classList.add('on'); S.tab = t.dataset.t;
       document.getElementById('p-' + S.tab).classList.add('on');
     });
   });
 }
 
+// ============================================================
+// Data fetching
+// ============================================================
 async function fetchData() {
   S.loading = true; renderStrip();
   try {
-    const r = await fetch(S.url + '?action=all');
-    const text = await r.text();
-    if (text.trim().charAt(0) !== '{') {
-      S.err = 'Response is not JSON — check your Apps Script URL and deployment';
-    } else {
-      const d = JSON.parse(text);
-      if (d.status === 'ok') { S.data = d; S.err = null; }
-      else S.err = d.msg || 'Error';
-    }
+    const [mainR, indR] = await Promise.all([
+      fetch(S.url + '?action=all'),
+      fetch(S.url + '?action=indicators&hours=168')
+    ]);
+    const mainText = await mainR.text();
+    if (mainText.trim().charAt(0) !== '{') { S.err = 'Not JSON — check URL'; }
+    else { const d = JSON.parse(mainText); if (d.status === 'ok') { S.data = d; S.err = null; } else S.err = d.msg || 'Error'; }
+    try { const it = await indR.text(); const id = JSON.parse(it); if (id.status === 'ok') S.indicators = id.indicators || []; }
+    catch(e) { S.indicators = []; }
   } catch(e) { S.err = e.message; }
-  S.loading = false;
-  render();
-  clearTimeout(S.timer);
-  S.timer = setTimeout(fetchData, S.refreshMs);
+  S.loading = false; render();
+  clearTimeout(S.timer); S.timer = setTimeout(fetchData, S.refreshMs);
 }
 
 // ============================================================
-// Regime (same logic as phone)
+// Regime — Option B full integration (same logic as phone)
 // ============================================================
 function calcRegime() {
-  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], gates:[] };
+  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], primeBlockers:[] };
   const L = S.data.latest, D = S.data.daily || [];
-  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], gates:[] };
+  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], primeBlockers:[] };
 
   const cautionR = [], primeBlock = [];
+
   if (L.acct && L.tm && L.acct.dd >= L.tm.ddSoft)
-    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% >= ' + L.tm.ddSoft + '%');
+    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% ≥ ' + L.tm.ddSoft + '%');
 
   if (L.pairs) for (const p of L.pairs) {
     const grid = Math.max(p.buyN||0, p.sellN||0);
     const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
-    if (adxPct >= 0.8 && p.brk) cautionR.push(p.n + ' ADX ' + p.adx.toFixed(0));
-    if (grid >= 6) cautionR.push(p.n + ' grid ' + grid);
+    const maxDepth = Math.max(p.buyDepth||0, p.sellDepth||0);
+    const maxVel = Math.max(p.buyVel||0, p.sellVel||0);
+    const maxAge = Math.max(p.oldBuyAge||0, p.oldSellAge||0);
+    const prcPct = p.prcPct || 50;
+    const rsi = p.rsi || 50;
+    const h1Bull = (p.diP||0) > (p.diM||0);
+    const domSide = (p.buyN||0) >= (p.sellN||0) ? 'buy' : 'sell';
+
+    // CAUTION triggers
+    if (adxPct >= 0.8 && p.brk) cautionR.push(p.n + ' ADX ' + p.adx.toFixed(0) + ' (' + (adxPct*100).toFixed(0) + '%)');
+    if (grid >= 6) cautionR.push(p.n + ' grid ' + grid + ' trades');
     if (p.atrR >= 1.3) cautionR.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
     if (p.fb) cautionR.push(p.n + ' float breaker');
-    if (adxPct >= 0.7) primeBlock.push(p.n + ' ADX');
-    if (p.atrR >= 1.1) primeBlock.push(p.n + ' ATR');
-    if (grid > 4) primeBlock.push(p.n + ' grid');
+    if (maxDepth >= 50) cautionR.push(p.n + ' grid ' + maxDepth.toFixed(0) + 'p deep');
+    if (maxVel >= 3) cautionR.push(p.n + ' velocity ' + maxVel + '/hr');
+    if (maxAge >= 1440) cautionR.push(p.n + ' stuck ' + Math.floor(maxAge/60) + 'h');
+    if ((p.adxH4||0) >= 25 && adxPct < 0.8) {
+      const h4Bull = (p.diPH4||0) > (p.diMH4||0);
+      if ((domSide === 'buy' && !h4Bull) || (domSide === 'sell' && h4Bull))
+        cautionR.push(p.n + ' H4 against ' + domSide);
+    }
+
+    // PRIME blockers
+    if (adxPct >= 0.7) primeBlock.push(p.n + ' ADX ' + (adxPct*100).toFixed(0) + '%');
+    if (p.atrR >= 1.1) primeBlock.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
+    if (grid > 4) primeBlock.push(p.n + ' grid ' + grid);
+    if (maxDepth > 20) primeBlock.push(p.n + ' depth ' + maxDepth.toFixed(0) + 'p');
+    if (maxAge > 360) primeBlock.push(p.n + ' trade open ' + Math.floor(maxAge/60) + 'h');
+    if ((p.buyN||0) > 0 && prcPct > 80) primeBlock.push(p.n + ' buys@' + prcPct.toFixed(0) + 'pctl');
+    if ((p.sellN||0) > 0 && prcPct < 20) primeBlock.push(p.n + ' sells@' + prcPct.toFixed(0) + 'pctl');
+    if ((p.adxSlp||0) > 0 && grid > 0 && ((domSide==='buy'&&!h1Bull)||(domSide==='sell'&&h1Bull)))
+      primeBlock.push(p.n + ' ADX rising vs grid');
+    if ((p.buyN||0) > (p.sellN||0) && rsi > 72) primeBlock.push(p.n + ' RSI ' + rsi.toFixed(0));
+    if ((p.sellN||0) > (p.buyN||0) && rsi < 28) primeBlock.push(p.n + ' RSI ' + rsi.toFixed(0));
   }
 
+  if (L.eurCorr) cautionR.push('EUR pairs correlated');
   const streak = calcLossStreak(D);
   if (streak >= 4) cautionR.push(streak + '-day loss streak');
-  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, gates:primeBlock };
+
+  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, primeBlockers:primeBlock };
 
   const pnl7d = calc7dPnl(D);
-  if (pnl7d <= 0) primeBlock.push('7d P&L');
+  if (pnl7d <= 0) primeBlock.push('7d P&L $' + pnl7d.toFixed(2));
   const rf = calcRF(D);
   if (rf < 1.5 && rf >= 0) primeBlock.push('RF ' + rf.toFixed(1));
-  if (L.acct) {
-    const cushion = L.acct.eq - L.acct.floor;
-    const dd7d = calc7dMaxDD();
-    if (cushion > 0 && dd7d > cushion * 0.4) primeBlock.push('7d DD');
-  }
-  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], gates:[] };
-  return { r:'NORMAL', c:'var(--blu)', reasons:[], gates:primeBlock };
+  if (L.acct) { const c = L.acct.eq - L.acct.floor, dd = calc7dMaxDD(); if (c > 0 && dd > c * 0.4) primeBlock.push('7d DD > 40% cushion'); }
+  if (L.eurCorr) primeBlock.push('EUR correlated');
+
+  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], primeBlockers:[] };
+  return { r:'NORMAL', c:'var(--blu)', reasons:[], primeBlockers:primeBlock };
 }
 
-function calcLossStreak(D) {
-  if (!D || !D.length) return 0;
-  const bd = {}; for (const d of D) bd[d.date] = (bd[d.date]||0) + (d.pnl||0);
-  let s = 0; for (const dt of Object.keys(bd).sort().reverse()) { if (bd[dt] < 0) s++; else break; } return s;
-}
-function calc7dPnl(D) {
-  if (!D) return 0;
-  const c = new Date(); c.setDate(c.getDate()-7);
-  const cs = c.toISOString().substring(0,10).replace(/-/g,'.');
-  return D.filter(d=>d.date>=cs).reduce((s,d)=>s+(d.pnl||0),0);
-}
-function calcRF(D) {
-  if (!D||!D.length) return 0;
-  const bd = {}; for (const d of D) bd[d.date] = (bd[d.date]||0) + (d.pnl||0);
-  let cum=0,pk=0,mdd=0;
-  for (const dt of Object.keys(bd).sort()) { cum+=bd[dt]; if(cum>pk) pk=cum; const dd=pk-cum; if(dd>mdd) mdd=dd; }
-  return mdd<=0 ? (cum>0?99:0) : cum/mdd;
-}
-function calc7dMaxDD() {
-  if (!S.data||!S.data.snapshots) return 0;
-  let mx=0; for (const s of S.data.snapshots) if(s.dd>mx) mx=s.dd;
-  return (S.data.latest?S.data.latest.acct.bal:0)*mx/100;
-}
+// ============================================================
+// Helpers (same as phone)
+// ============================================================
+function calcLossStreak(D) { if(!D||!D.length) return 0; const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0); let s=0; for(const dt of Object.keys(bd).sort().reverse()){if(bd[dt]<0)s++;else break;} return s; }
+function calc7dPnl(D) { if(!D) return 0; const c=new Date();c.setDate(c.getDate()-7); const cs=c.toISOString().substring(0,10).replace(/-/g,'.'); return D.filter(d=>d.date>=cs).reduce((s,d)=>s+(d.pnl||0),0); }
+function calcRF(D) { if(!D||!D.length) return 0; const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0); let cum=0,pk=0,mdd=0; for(const dt of Object.keys(bd).sort()){cum+=bd[dt];if(cum>pk)pk=cum;const dd=pk-cum;if(dd>mdd)mdd=dd;} return mdd<=0?(cum>0?99:0):cum/mdd; }
+function calc7dMaxDD() { if(!S.data||!S.data.snapshots) return 0; let mx=0; for(const s of S.data.snapshots) if(s.dd>mx)mx=s.dd; return (S.data.latest?S.data.latest.acct.bal:0)*mx/100; }
 function calcLots() {
-  if (!S.data||!S.data.latest) return null;
-  const L=S.data.latest, reg=calcRegime(), pairs=L.pairs?L.pairs.length:1;
-  const cushion=L.acct.eq-L.acct.floor, pp=pairs>0?cushion/pairs:cushion;
-  const hm=Math.max(0.01,Math.floor(pp/100)*0.01), tm2=Math.max(0.01,Math.floor(pp/150)*0.01);
-  let rec; switch(reg.r){ case'PRIME':rec=tm2;break; case'NORMAL':rec=Math.min(hm,L.acct.baseLots||0.01);break;
-    case'CAUTION':rec=L.acct.baseLots||0.01;break; default:rec=0.01; }
+  if(!S.data||!S.data.latest) return null;
+  const L=S.data.latest,reg=calcRegime(),pairs=L.pairs?L.pairs.length:1;
+  const cushion=L.acct.eq-L.acct.floor,pp=pairs>0?cushion/pairs:cushion;
+  const hm=Math.max(0.01,Math.floor(pp/100)*0.01),tm2=Math.max(0.01,Math.floor(pp/150)*0.01);
+  let rec; switch(reg.r){case'PRIME':rec=tm2;break;case'NORMAL':rec=Math.min(hm,L.acct.baseLots||0.01);break;case'CAUTION':rec=L.acct.baseLots||0.01;break;default:rec=0.01;}
   rec=Math.max(0.01,rec);
   const pct=hm>0.01?Math.min(100,((rec-0.01)/(hm-0.01))*100):0;
-  return { rec,hardMax:hm,tierMax:tm2,cushion,perPair:pp,pct,regime:reg };
+  return {rec,hardMax:hm,tierMax:tm2,cushion,perPair:pp,pct,regime:reg};
+}
+function calcExpectancy(daily, pairName) {
+  const rows = pairName ? daily.filter(d => d.pair === pairName) : daily;
+  let gW=0,gL=0,tW=0,tL=0;
+  for(const d of rows){gW+=d.grossWin||0;gL+=d.grossLoss||0;tW+=d.wins||0;tL+=d.losses||0;}
+  const tot=tW+tL; if(tot===0) return null;
+  const wr=tW/tot, aW=tW>0?gW/tW:0, aL=tL>0?gL/tL:0;
+  const exp=(wr*aW)-((1-wr)*aL), pf=gL>0?gW/gL:(gW>0?99:0);
+  return {exp,pf,winRate:wr,avgWin:aW,avgLoss:aL,totalWins:tW,totalLosses:tL};
+}
+function pairCondition(p) {
+  let score=0;const reasons=[];
+  const adxPct=p.adxR>0?p.adx/p.adxR:0;
+  if(adxPct<0.5){score+=1;reasons.push('Low ADX');}else if(adxPct>=0.8){score-=2;reasons.push('High ADX');}else if(adxPct>=0.7){score-=1;}
+  const bbw=p.bbw||0; if(bbw>0&&bbw<0.005){score+=1;reasons.push('Tight BBW');}else if(bbw>0.015){score-=1;reasons.push('Wide BBW');}
+  const maxDepth=Math.max(p.buyDepth||0,p.sellDepth||0);
+  if(maxDepth>50){score-=2;reasons.push('Deep grid');}else if(maxDepth>20){score-=1;}else if(maxDepth===0){score+=1;}
+  const rngPct=p.rngPct||50; if(rngPct>80){score+=1;reasons.push('Range spent');}
+  const maxVel=Math.max(p.buyVel||0,p.sellVel||0); if(maxVel>=3){score-=2;reasons.push('Rapid stacking');}
+  if(p.atrR>=1.3){score-=1;reasons.push('High ATR');}else if(p.atrR<0.8){score+=1;reasons.push('Calm');}
+  let label,col;
+  if(score>=2){label='FAVORABLE';col='var(--grn)';}else if(score<=-2){label='UNFAVORABLE';col='var(--red)';}else{label='NEUTRAL';col='var(--dim)';}
+  return {label,col,reasons,score};
 }
 
 // ============================================================
 // Render
 // ============================================================
-function render() { renderStrip(); renderLive(); renderLots(); renderPairs(); renderMgr(); renderHist(); }
+function render() { renderStrip(); renderOverview(); renderPairs(); renderMarket(); renderStrategy(); renderHistory(); renderLab(); }
 
+// ============================================================
+// Strip (always visible)
+// ============================================================
 function renderStrip() {
   const el = document.getElementById('strip');
-  if (!S.data||!S.data.latest) {
+  if (!S.data || !S.data.latest) {
     el.innerHTML = `<span class="strip-title"><span class="a">TM</span> Dashboard</span>
-      <span class="dim">${S.loading?'Loading...':(S.err||'No data')}</span>
-      <span class="f1"></span><button class="btn-sm" onclick="disconnect()">Disconnect</button>`;
+      <span class="dim" style="font-size:11px">${S.loading ? 'Loading...' : (S.err || 'Waiting for data')}</span>`;
     return;
   }
-  const L=S.data.latest, a=L.acct, reg=calcRegime(), tm=L.tm||{};
-  el.innerHTML = `<span class="strip-title"><span class="a">TM</span> Dashboard <span class="strip-dot" style="background:${reg.c}"></span></span>
+  const L = S.data.latest, a = L.acct, reg = calcRegime(), session = L.session || '';
+  el.innerHTML = `<span class="strip-title"><span class="a">TM</span> Dashboard<span class="strip-dot" style="background:${reg.c}"></span></span>
     <div class="strip-metrics">
-      <span><span class="lbl">Bal</span><span class="val">$${a.bal.toFixed(0)}</span></span>
       <span><span class="lbl">Eq</span><span class="val">$${a.eq.toFixed(0)}</span></span>
       <span><span class="lbl">DD</span><span class="val ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</span></span>
-      <span><span class="lbl">Peak</span><span class="val">$${a.peak.toFixed(0)}</span></span>
-      <span><span class="lbl">Trades</span><span class="val">${L.totalOpen||0}/${tm.maxT||50}</span></span>
-      <span><span class="lbl">TM</span><span class="val" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'ON':'OFF'}</span></span>
+      <span><span class="lbl">Cushion</span><span class="val pos">$${(a.eq-a.floor).toFixed(0)}</span></span>
+      <span><span class="lbl">Float</span><span class="val ${(L.pairs||[]).reduce((s,p)=>s+(p.floatPnl||0),0)>=0?'pos':'neg'}">$${(L.pairs||[]).reduce((s,p)=>s+(p.floatPnl||0),0).toFixed(2)}</span></span>
     </div>
-    <span class="pill" style="background:${reg.c}22;color:${reg.c};border:1px solid ${reg.c}44">${reg.r}</span>
-    <span class="dim" style="font-size:9px">${L.ts?L.ts.substring(11,16):''}</span>
-    <button class="btn-sm" onclick="fetchData()">Refresh</button>
-    <button class="btn-sm" onclick="disconnect()">×</button>`;
+    <div class="strip-right">
+      ${session ? '<span class="session-badge">' + session.toUpperCase() + '</span>' : ''}
+      <span class="pill" style="background:${reg.c}22;color:${reg.c};border:1px solid ${reg.c}44">${reg.r}</span>
+      <span class="dim" style="font-size:9px">${L.ts ? L.ts.substring(11,16) : ''} GMT</span>
+    </div>`;
 }
 
 // ============================================================
-// LIVE
+// OVERVIEW tab
 // ============================================================
-function renderLive() {
-  const el=document.getElementById('p-live');
-  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">Waiting for data...</div>';return;}
-  const L=S.data.latest, a=L.acct, reg=calcRegime(), tm=L.tm||{};
-  let h='';
+function renderOverview() {
+  const el = document.getElementById('p-overview');
+  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">Waiting for data...</div>'; return; }
+  const L = S.data.latest, a = L.acct, reg = calcRegime(), tm = L.tm || {}, lots = calcLots(), D = S.data.daily || [];
+  let h = '';
+
+  // Action bar
+  h += buildActionBar(reg, lots);
 
   // Alerts
-  if(tm.kill) h+=`<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span style="color:var(--red);font-weight:700">KILL SWITCH ACTIVATED</span></div>`;
-  if(reg.reasons&&reg.reasons.length) h+=`<div class="alert" style="background:${reg.c}12;border:1px solid ${reg.c}33;color:${reg.c}">${reg.reasons.join(' · ')}</div>`;
-
-  h+='<div class="g2">';
-  // Left: Account + lot sizing
-  h+=`<div>
-    <div class="card"><div class="card-t">Account</div><div class="mg mg3">
-      <div class="m"><div class="m-l">Balance</div><div class="m-v">$${a.bal.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Equity</div><div class="m-v">$${a.eq.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Drawdown</div><div class="m-v ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</div></div>
-    </div><div class="mg mg3">
-      <div class="m"><div class="m-l">Peak</div><div class="m-v">$${a.peak.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Floor</div><div class="m-v">$${a.floor.toFixed(0)}</div></div>
-      <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${(a.eq-a.floor).toFixed(0)}</div></div>
-    </div>${renderSparkline()}</div>`;
-
-  // TM status
-  h+=`<div class="card"><div class="card-t">Trade Manager</div><div class="mg mg2">
-      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'Online':'Offline'}</div></div>
-      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def?'DEFENSIVE':'Normal'}</div></div>
-    </div><div class="mg mg4">
-      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
-      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
-      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
-      <div class="m"><div class="m-l">Float</div><div class="m-v">${tm.dayF||0}</div></div>
-    </div></div>`;
-  h+='</div>';
-
-  // Pair comparison table
-  if(L.pairs&&L.pairs.length) {
-    h+=`<div class="card"><div class="card-t">Pair Overview</div><table><thead><tr><th></th>`;
-    for(const p of L.pairs) h+=`<th style="text-align:center">${p.n}</th>`;
-    h+='</tr></thead><tbody>';
-    const rows = [
-      {l:'ADX',fn:p=>{const pct=p.adxR>0?p.adx/p.adxR:0;const c=pct>=0.8?'neg':pct>=0.7?'warn':'pos';return`<span class="${c}">${p.adx.toFixed(0)}</span>/<span class="dim">${p.adxR}</span>`}},
-      {l:'Trend',fn:p=>{const t=(p.diP||0)>(p.diM||0)?'UP':'DN';return`<span style="color:${t==='UP'?'var(--grn)':'var(--red)'}">${t}</span>`}},
-      {l:'ATR',fn:p=>`<span class="${p.atrR>=1.3?'neg':p.atrR>=1.1?'warn':''}">${p.atrR.toFixed(2)}x</span>`},
-      {l:'Grid (B/S)',fn:p=>`${p.buyN||0} / ${p.sellN||0}`},
-      {l:'Lots (B/S)',fn:p=>`${(p.buyLot||0).toFixed(2)} / ${(p.sellLot||0).toFixed(2)}`},
-      {l:'Max Lot',fn:p=>`${Math.max(p.maxBuyLot||0,p.maxSellLot||0).toFixed(2)}`},
-      {l:'Float P&L',fn:p=>`<span class="${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</span>`},
-      {l:'Spread',fn:p=>`${(p.spd||0).toFixed(0)}`},
-      {l:'Breakout',fn:p=>p.brk?'<span class="warn">YES</span>':'<span class="dim">no</span>'},
-      {l:'Float Brk',fn:p=>p.fb?'<span class="neg">ACTIVE</span>':'<span class="dim">off</span>'},
-      {l:'Cooldown',fn:p=>(p.cdB||p.cdS)?`<span class="warn">${p.cdB?'B':''}${p.cdS?'S':''}</span>`:'<span class="dim">—</span>'},
-    ];
-    for(const r of rows) {
-      h+=`<tr><td class="dim">${r.l}</td>`;
-      for(const p of L.pairs) h+=`<td style="text-align:center">${r.fn(p)}</td>`;
-      h+='</tr>';
-    }
-    h+='</tbody></table></div>';
+  if (tm.kill) h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span class="alert-icon">⛔</span><span style="color:var(--red);font-weight:700">KILL SWITCH — All trading halted</span></div>`;
+  if (L.eurCorr) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)"><span class="alert-icon">⚠</span><span style="color:var(--amb)">EUR correlation — both EUR pairs in drawdown, doubled exposure</span></div>`;
+  if (L.pairs) for (const p of L.pairs) {
+    const maxVel = Math.max(p.buyVel||0, p.sellVel||0);
+    if (maxVel >= 3) h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span class="alert-icon">🔺</span><span style="color:var(--red)">${p.n} rapid stacking — ${maxVel} trades/hr</span></div>`;
+    const maxAge = Math.max(p.oldBuyAge||0, p.oldSellAge||0);
+    if (maxAge >= 1440) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)"><span class="alert-icon">⏱</span><span style="color:var(--amb)">${p.n} grid stuck ${Math.floor(maxAge/60)}h</span></div>`;
   }
+  if (!tm.active) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB)"><span class="alert-icon">⚠</span><span style="color:var(--amb)">Trade Manager offline</span></div>`;
 
-  // Open trades (full table)
-  if(L.trades&&L.trades.length) {
-    const sorted=[...L.trades].sort((a,b)=>a.pl-b.pl);
-    h+=`<div class="card"><div class="card-t">Open Trades (${sorted.length})</div>
-      <table><thead><tr><th>Pair</th><th>Side</th><th>Lots</th><th>Open</th><th>Current</th><th>P&L</th><th>Duration</th><th>SL</th></tr></thead><tbody>`;
-    for(const t of sorted) {
-      h+=`<tr><td style="font-weight:700">${t.pr}</td>
-        <td class="${t.ty==='B'?'pos':'neg'}">${t.ty}</td>
-        <td>${t.lt}</td><td>${t.op}</td><td>${t.cp}</td>
-        <td class="${t.pl>=0?'pos':'neg'}" style="font-weight:600">$${t.pl.toFixed(2)}</td>
-        <td class="dim">${t.dur}m</td><td class="dim">${t.sl||'—'}</td></tr>`;
-    }
-    h+='</tbody></table></div>';
-  }
+  h += '<div class="g2">';
 
-  el.innerHTML=h;
-}
+  // Left column — Account + equity
+  h += '<div>';
+  h += `<div class="card"><div class="card-t">Account</div><div class="mg mg3">
+    <div class="m"><div class="m-l">Balance</div><div class="m-v">$${a.bal.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Equity</div><div class="m-v">$${a.eq.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Drawdown</div><div class="m-v ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</div></div>
+  </div><div class="mg mg3">
+    <div class="m"><div class="m-l">Peak</div><div class="m-v">$${a.peak.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Floor</div><div class="m-v">$${a.floor.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${(a.eq-a.floor).toFixed(0)}</div></div>
+  </div>`;
+  // Equity chart
+  const snaps = S.data.snapshots || [];
+  if (snaps.length > 2) h += `<div class="chart-wrap">${renderEquityChart(snaps)}</div>`;
+  h += '</div>';
 
-// ============================================================
-// LOT SIZING
-// ============================================================
-function renderLots() {
-  const el=document.getElementById('p-lots');
-  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
-  const L=S.data.latest, lots=calcLots(), reg=lots?lots.regime:calcRegime(), D=S.data.daily||[];
-  let h='';
-
-  h+=`<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
-
-  h+='<div class="g2">';
-  // Left: recommendation
-  if(lots) {
-    h+=`<div class="card"><div class="card-t">Recommendation</div>
-      <div class="tac" style="padding:14px 0"><div style="font-size:32px;font-weight:700;color:${reg.c}">${lots.rec.toFixed(2)}</div>
-      <div class="dim mt4">lots per position</div></div>
+  // Right column — Lots + gates
+  h += '<div>';
+  if (lots) {
+    h += `<div class="card"><div class="card-t">Lot Sizing</div>
+      <div class="tac" style="padding:8px 0"><div style="font-size:28px;font-weight:700;color:${reg.c}">${lots.rec.toFixed(2)}</div>
+      <div class="dim" style="font-size:10px;margin-top:2px">lots per position</div></div>
       <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${lots.pct}%;background:${reg.c}"></div></div>
-      <div class="fxb dim" style="font-size:9px;margin-top:4px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
-      <div class="mg mg2 mt8">
-        <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${lots.cushion.toFixed(0)}</div></div>
-        <div class="m"><div class="m-l">Per Pair</div><div class="m-v">$${lots.perPair.toFixed(0)}</div></div>
-        <div class="m"><div class="m-l">Hard Gate (÷$100)</div><div class="m-v">${lots.hardMax.toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">Tier Gate (÷$150)</div><div class="m-v">${lots.tierMax.toFixed(2)}</div></div>
-      </div></div>`;
-  }
-
-  // Right: all gates
-  const pnl7d=calc7dPnl(D), rfVal=calcRF(D), streak=calcLossStreak(D);
-  const gates=[
-    {name:'7d Net P&L',val:'$'+pnl7d.toFixed(2),pass:pnl7d>0,cat:'Track Record'},
-    {name:'Recovery Factor',val:rfVal>=99?'∞':rfVal.toFixed(1),pass:rfVal>=1.5,cat:'Track Record'},
-    {name:'Loss Streak',val:streak+' days',pass:streak<4,cat:'Track Record'},
-  ];
-  if(L.pairs) for(const p of L.pairs) {
-    const adxPct=p.adxR>0?(p.adx/p.adxR*100):0, grid=Math.max(p.buyN||0,p.sellN||0);
-    gates.push({name:p.n+' ADX',val:adxPct.toFixed(0)+'%',pass:adxPct<70,cat:'Market'});
-    gates.push({name:p.n+' ATR',val:p.atrR.toFixed(2)+'x',pass:p.atrR<1.1,cat:'Market'});
-    gates.push({name:p.n+' Grid',val:grid.toString(),pass:grid<=4,cat:'Market'});
-  }
-
-  h+=`<div class="card"><div class="card-t">All Gates</div>`;
-  for(const g of gates) {
-    const col=g.pass?'var(--grn)':'var(--red)';
-    h+=`<div class="row"><span class="row-l">${g.name}</span>
-      <span><span class="row-v" style="margin-right:8px">${g.val}</span>
-      <span class="pill" style="background:${col}22;color:${col}">${g.pass?'PASS':'FAIL'}</span></span></div>`;
-  }
-  h+=`<div class="dim mt4" style="font-size:8px">PRIME requires all gates to pass. Any gate failing caps at NORMAL.</div></div>`;
-  h+='</div>';
-
-  el.innerHTML=h;
-}
-
-// ============================================================
-// PAIRS
-// ============================================================
-function renderPairs() {
-  const el=document.getElementById('p-pairs');
-  if(!S.data||!S.data.latest||!S.data.latest.pairs){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
-  const L=S.data.latest, D=S.data.daily||[];
-  let h='';
-
-  // Side by side pair cards
-  h+=`<div class="g${Math.min(3,L.pairs.length)}">`;
-  for(const p of L.pairs) {
-    const pD=D.filter(d=>d.pair===p.n);
-    const tp=pD.reduce((s,d)=>s+(d.pnl||0),0);
-    const tw=pD.reduce((s,d)=>s+(d.wins||0),0);
-    const tl=pD.reduce((s,d)=>s+(d.losses||0),0);
-    const tc=tw+tl, wr=tc>0?(tw/tc*100):0;
-    const days=new Set(pD.map(d=>d.date)).size;
-    const dr=days>0?tp/days:0;
-    const tbp=pD.reduce((s,d)=>s+(d.blkPnl||0),0);
-    const tbc=pD.reduce((s,d)=>s+(d.blkClosed||0),0);
-    const gp=pD.reduce((s,d)=>s+(d.pnl>0?d.pnl:0),0);
-    const bcr=gp>0?(Math.abs(tbp)/gp*100):0;
-    const today=L.day||''; const td=pD.find(d=>d.date===today);
-    const adxPct=p.adxR>0?p.adx/p.adxR:0;
-    const adxCol=adxPct>=0.8?'var(--red)':adxPct>=0.7?'var(--amb)':'var(--grn)';
-    const grid=Math.max(p.buyN||0,p.sellN||0);
-    const trend=(p.diP||0)>(p.diM||0)?'UP':'DN';
-
-    h+=`<div class="pcard">
-      <div class="pcard-hdr"><span class="pcard-name">${p.n}</span>
-        <span class="pill" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span></div>
-      <div class="badge">
-        <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
-        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Grid ${grid}</span>
-        <span class="bdg" style="color:${trend==='UP'?'var(--grn)':'var(--red)'}">▸${trend}</span>
-        ${p.fb?'<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT</span>':''}
-      </div>
-      <div class="mg mg2 mt4">
-        <div class="m"><div class="m-l">Float</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">Today</div><div class="m-v ${(td?td.pnl:0)>=0?'pos':'neg'}">$${(td?td.pnl:0).toFixed(2)}</div></div>
-      </div>
-      <div class="mg mg2">
-        <div class="m"><div class="m-l">All Time</div><div class="m-v ${tp>=0?'pos':'neg'}">$${tp.toFixed(2)}</div></div>
-        <div class="m"><div class="m-l">$/day</div><div class="m-v ${dr>=0?'pos':'neg'}">${dr.toFixed(2)}</div></div>
-      </div>
-      <div class="mg mg3">
-        <div class="m"><div class="m-l">Win%</div><div class="m-v">${wr.toFixed(0)}%</div></div>
-        <div class="m"><div class="m-l">Blk Cost</div><div class="m-v">${bcr.toFixed(0)}%</div></div>
-        <div class="m"><div class="m-l">Trades</div><div class="m-v">${tc}</div></div>
-      </div>
-      <div class="fxb dim mt4" style="font-size:9px"><span>${days}d active</span><span>Blk: ${tbc} ($${tbp.toFixed(2)})</span></div>
+      <div class="fxb dim" style="font-size:9px;margin-top:2px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
     </div>`;
   }
-  h+='</div>';
 
-  // Retired pairs
-  if(D.length>0&&L.pairs) {
-    const active=new Set(L.pairs.map(p=>p.n));
-    const all=new Set(D.map(d=>d.pair));
-    const retired=[...all].filter(p=>!active.has(p));
-    if(retired.length) {
-      h+=`<div class="card mt8"><div class="card-t">Retired Pairs</div>`;
-      for(const rp of retired) {
-        const rd=D.filter(d=>d.pair===rp); const rpnl=rd.reduce((s,d)=>s+(d.pnl||0),0);
-        const rdays=new Set(rd.map(d=>d.date)).size;
-        h+=`<div class="row"><span class="row-l">${rp} <span class="dim">(${rdays}d)</span></span>
-          <span class="row-v ${rpnl>=0?'pos':'neg'}">$${rpnl.toFixed(2)}</span></div>`;
-      }
-      h+='</div>';
-    }
+  // Gate progress
+  h += `<div class="card"><div class="card-t">Gate Status</div>`;
+  const gates = buildGateList(L, D);
+  for (const g of gates) {
+    const col = g.pass ? 'var(--grn)' : 'var(--red)';
+    h += `<div class="row"><span class="row-l">${g.name}</span>
+      <span class="fx gap4" style="align-items:center">
+        <span class="row-v" style="margin-right:4px">${g.val}</span>
+        <span class="pill" style="background:${col}22;color:${col}">${g.pass ? 'PASS' : 'FAIL'}</span>
+      </span></div>`;
   }
-  el.innerHTML=h;
-}
+  h += '</div>';
+  h += '</div></div>'; // close g2
 
-// ============================================================
-// MANAGER
-// ============================================================
-function renderMgr() {
-  const el=document.getElementById('p-mgr');
-  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
-  const L=S.data.latest, tm=L.tm||{}, D=S.data.daily||[];
-  let h='';
+  // 3-pair comparison table
+  if (L.pairs && L.pairs.length > 1) {
+    h += `<div class="card"><div class="card-t">Pair Comparison</div><table>
+      <tr><th></th>`;
+    for (const p of L.pairs) h += `<th class="tar">${p.n}</th>`;
+    h += '</tr>';
 
-  h+='<div class="g2">';
-  // Left: TM config + status
-  h+=`<div><div class="card"><div class="card-t">TM Status</div><div class="mg mg2">
-      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'Online':'Offline'}</div></div>
-      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def?'DEFENSIVE':'Normal'}</div></div>
-    </div><div class="mg mg4">
-      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
-      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
-      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
-      <div class="m"><div class="m-l">Float</div><div class="m-v">${tm.dayF||0}</div></div>
-    </div></div>
-    <div class="card"><div class="card-t">TM Config</div>
-      <div class="row"><span class="row-l">DD Soft</span><span class="row-v">${tm.ddSoft||15}%</span></div>
-      <div class="row"><span class="row-l">Defensive DD</span><span class="row-v">${tm.defDD||10}%</span></div>
-      <div class="row"><span class="row-l">Max Trades</span><span class="row-v">${tm.maxT||50}</span></div>
-      <div class="row"><span class="row-l">Equity Floor</span><span class="row-v">$${L.acct.floor.toFixed(0)}</span></div>
-    </div></div>`;
+    const metrics = [
+      { label: 'Condition', fn: p => { const c = pairCondition(p); return `<span style="color:${c.col}">${c.label}</span>`; }},
+      { label: 'Float P&L', fn: p => `<span class="${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</span>` },
+      { label: 'Grid Depth', fn: p => { const d=Math.max(p.buyDepth||0,p.sellDepth||0); return d>0?`<span class="${d>50?'neg':d>20?'warn':''}">${d.toFixed(0)}p</span>`:'—'; }},
+      { label: 'ADX / Red', fn: p => { const pct=p.adxR>0?(p.adx/p.adxR*100):0; return `<span class="${pct>=80?'neg':pct>=70?'warn':''}">${p.adx.toFixed(0)}/${p.adxR} (${pct.toFixed(0)}%)</span>`; }},
+      { label: 'H4 ADX', fn: p => (p.adxH4||0) > 0 ? (p.adxH4||0).toFixed(0) : '—' },
+      { label: 'RSI', fn: p => { const r=p.rsi||50; return `<span class="${r>70||r<30?'warn':''}">${r.toFixed(0)}</span>`; }},
+      { label: 'Price Pctl', fn: p => (p.prcPct||50).toFixed(0) + '%' },
+      { label: 'EMA Trend', fn: p => p.emaBull ? '<span class="pos">BULL</span>' : '<span class="neg">BEAR</span>' },
+      { label: 'ATR Ratio', fn: p => `<span class="${p.atrR>=1.3?'neg':p.atrR>=1.1?'warn':''}">${p.atrR.toFixed(2)}x</span>` },
+      { label: 'Swap', fn: p => (p.swap||0) < -0.01 ? `<span class="warn">$${(p.swap||0).toFixed(2)}</span>` : '$0.00' },
+      { label: 'All-Time P&L', fn: p => { const pd = D.filter(d=>d.pair===p.n); const t=pd.reduce((s,d)=>s+(d.pnl||0),0); return `<span class="${t>=0?'pos':'neg'}">$${t.toFixed(2)}</span>`; }},
+      { label: '$/day', fn: p => { const pd = D.filter(d=>d.pair===p.n); const t=pd.reduce((s,d)=>s+(d.pnl||0),0); const days=new Set(pd.map(d=>d.date)).size; return days>0?`<span class="${t/days>=0?'pos':'neg'}">${(t/days).toFixed(2)}</span>`:'—'; }},
+    ];
 
-  // Right: strategy metrics
-  const pnl7d=calc7dPnl(D),rfVal=calcRF(D),streak=calcLossStreak(D);
-  const tp=D.reduce((s,d)=>s+(d.pnl||0),0),td2=new Set(D.map(d=>d.date)).size;
-  const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0);
-  let gw=0,gl=0; for(const dt of Object.keys(bd)){if(bd[dt]>0)gw+=bd[dt];else gl+=Math.abs(bd[dt]);}
-  const dpf=gl>0?gw/gl:(gw>0?99:0);
-
-  h+=`<div><div class="card"><div class="card-t">Strategy Metrics</div><div class="mg mg3">
-      <div class="m"><div class="m-l">Total P&L</div><div class="m-v ${tp>=0?'pos':'neg'}">$${tp.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">$/day avg</div><div class="m-v">${td2>0?(tp/td2).toFixed(2):'—'}</div></div>
-    </div><div class="mg mg3">
-      <div class="m"><div class="m-l">Daily PF*</div><div class="m-v">${dpf>=99?'∞':dpf.toFixed(2)}</div></div>
-      <div class="m"><div class="m-l">RF</div><div class="m-v">${rfVal>=99?'∞':rfVal.toFixed(1)}</div></div>
-      <div class="m"><div class="m-l">Loss Streak</div><div class="m-v ${streak>=4?'neg':''}">${streak}d</div></div>
-    </div>
-    <div class="dim" style="font-size:8px">*Daily PF uses daily net P&L, not trade-level gross win/loss</div>
-    </div>`;
-
-  // Block cost ratio
-  if(L.pairs&&D.length) {
-    h+=`<div class="card"><div class="card-t">Block Cost Ratio</div>`;
-    for(const p of L.pairs) {
-      const pd=D.filter(d=>d.pair===p.n);
-      const bp=pd.reduce((s,d)=>s+Math.abs(d.blkPnl||0),0);
-      const gp=pd.reduce((s,d)=>s+(d.pnl>0?d.pnl:0),0);
-      const r=gp>0?(bp/gp*100):0;
-      h+=`<div class="row"><span class="row-l">${p.n}</span>
-        <span class="row-v ${r>20?'neg':r>10?'warn':''}">${r.toFixed(1)}%</span></div>`;
+    for (const m of metrics) {
+      h += `<tr><td class="dim">${m.label}</td>`;
+      for (const p of L.pairs) h += `<td class="tar">${m.fn(p)}</td>`;
+      h += '</tr>';
     }
-    h+=`<div class="dim mt4" style="font-size:8px">|blocked P&L| ÷ gross positive P&L</div></div>`;
-  }
-  h+='</div>';
-  h+='</div>';
-
-  // ADX status table
-  if(L.pairs) {
-    h+=`<div class="card"><div class="card-t">ADX Status</div><table><thead><tr>
-      <th>Pair</th><th>ADX</th><th>Red</th><th>%</th><th>Trend</th><th>DI+</th><th>DI-</th><th>BRK</th></tr></thead><tbody>`;
-    for(const p of L.pairs) {
-      const pct=p.adxR>0?(p.adx/p.adxR*100):0;
-      const t=(p.diP||0)>(p.diM||0)?'UP':'DN';
-      h+=`<tr><td style="font-weight:700">${p.n}</td>
-        <td class="${pct>=80?'neg':pct>=70?'warn':''}">${p.adx.toFixed(1)}</td>
-        <td class="dim">${p.adxR}</td>
-        <td class="${pct>=80?'neg':pct>=70?'warn':''}">${pct.toFixed(0)}%</td>
-        <td style="color:${t==='UP'?'var(--grn)':'var(--red)'}">${t}</td>
-        <td>${(p.diP||0).toFixed(1)}</td><td>${(p.diM||0).toFixed(1)}</td>
-        <td>${p.brk?'<span class="warn">YES</span>':'<span class="dim">—</span>'}</td></tr>`;
-    }
-    h+='</tbody></table></div>';
+    h += '</table></div>';
   }
 
-  el.innerHTML=h;
-}
-
-// ============================================================
-// HISTORY
-// ============================================================
-function renderHist() {
-  const el=document.getElementById('p-hist');
-  if(!S.data){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
-  const D=S.data.daily||[], snaps=S.data.snapshots||[];
-  const tp=D.reduce((s,d)=>s+(d.pnl||0),0);
-  const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0);
-  const dates=Object.keys(bd).sort();
-  let h='';
-
-  // Running total + withdrawal tracking
-  const totalWd=S.withdrawals.reduce((s,w)=>s+(w.amount||0),0);
-  h+=`<div class="card"><div class="fxb">
-    <div><div class="card-t" style="margin:0">Running Total</div></div>
-    <div class="fx gap12" style="align-items:baseline">
-      <div class="m-v ${tp>=0?'pos':'neg'}" style="font-size:22px">$${tp.toFixed(2)}</div>
-      <button class="btn-sm" onclick="showWdModal()">+ Withdrawal</button>
-    </div></div>
-    ${totalWd>0?`<div class="dim mt4">Withdrawn: $${totalWd.toFixed(2)} | Net: $${(tp-totalWd).toFixed(2)}</div>`:''}
+  // Trades
+  const total = L.totalOpen||0, maxT = tm.maxT||50;
+  h += `<div class="card"><div class="fxb"><span class="card-t" style="margin:0">Open Trades ${total}/${maxT}</span>
+    <span class="dim" style="font-size:9px">A:${tm.dayA||0} B:${tm.dayB||0} C:${tm.dayC||0}</span></div>
+    <div class="pbar"><div class="pbar-fill" style="width:${(total/maxT*100).toFixed(0)}%;background:${total/maxT>0.8?'var(--red)':total/maxT>0.5?'var(--amb)':'var(--grn)'}"></div></div>
   </div>`;
 
-  // Charts side by side
-  h+='<div class="g2">';
-  if(snaps.length>2) {
-    h+=`<div class="card"><div class="card-t">Equity (${snaps.length} snapshots)</div>
-      <div class="chart-wrap">${renderEquityChart(snaps,500,150)}</div></div>`;
-  }
-  if(dates.length>0) {
-    h+=`<div class="card"><div class="card-t">Daily P&L</div>
-      <div class="chart-wrap">${renderDailyBars(dates,bd,500,130)}</div></div>`;
-  }
-  h+='</div>';
+  el.innerHTML = h;
+}
 
-  // Trade history table with pair filter
-  if(D.length>0) {
-    const pairsInData=[...new Set(D.map(d=>d.pair))].sort();
-    h+=`<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Daily History</div>
-      <div class="filters"><select id="histPairFilter" onchange="S.pairFilter=this.value;renderHist()">
-        <option value="all">All Pairs</option>${pairsInData.map(p=>`<option value="${p}" ${S.pairFilter===p?'selected':''}>${p}</option>`).join('')}
-      </select></div></div>
-      <table><thead><tr><th>Date</th><th>Pair</th><th>P&L</th><th>W</th><th>L</th><th>Win%</th><th>Avg Dur</th><th>Blk</th><th>Blk P&L</th></tr></thead><tbody>`;
+function buildActionBar(reg, lots) {
+  let msg='', blockerStr='';
+  switch(reg.r) {
+    case 'PRIME': msg='All gates clear. Conditions prime for scaling.'; if(lots) msg+=' Lot: '+lots.rec.toFixed(2); break;
+    case 'NORMAL': msg='Operating normally. Not yet clear for scaling.';
+      if(reg.primeBlockers&&reg.primeBlockers.length>0) blockerStr='Blocking PRIME: '+reg.primeBlockers.slice(0,4).join(' · ');
+      break;
+    case 'CAUTION': msg='Elevated risk detected.';
+      if(reg.reasons&&reg.reasons.length>0) blockerStr=reg.reasons.slice(0,4).join(' · ');
+      break;
+    case 'DEFENSIVE': msg='Defensive mode — protecting capital. Lot locked at 0.01.'; break;
+    default: msg='System offline.';
+  }
+  return `<div class="action-bar" style="background:${reg.c}18;border:1px solid ${reg.c}33">
+    <div class="label" style="color:${reg.c}">${reg.r}</div>
+    <div class="msg">${msg}</div>
+    ${blockerStr?'<div class="blockers">'+blockerStr+'</div>':''}
+  </div>`;
+}
 
-    const filtered=S.pairFilter==='all'?D:D.filter(d=>d.pair===S.pairFilter);
-    const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date)||a.pair.localeCompare(b.pair));
-    for(const d of sorted.slice(0,100)) {
-      const tc=(d.wins||0)+(d.losses||0);
-      const wr=tc>0?((d.wins||0)/tc*100):0;
-      h+=`<tr><td class="dim">${d.date}</td><td style="font-weight:600">${d.pair}</td>
-        <td class="${(d.pnl||0)>=0?'pos':'neg'}" style="font-weight:600">$${(d.pnl||0).toFixed(2)}</td>
-        <td class="pos">${d.wins||0}</td><td class="neg">${d.losses||0}</td>
-        <td>${wr.toFixed(0)}%</td><td class="dim">${(d.avgDur||0).toFixed(0)}m</td>
-        <td>${d.blkClosed||0}</td>
-        <td class="${(d.blkPnl||0)<0?'neg':''}">${(d.blkPnl||0)!==0?'$'+(d.blkPnl||0).toFixed(2):'—'}</td></tr>`;
+function buildGateList(L, D) {
+  const gates = [];
+  const pnl7d = calc7dPnl(D), rf = calcRF(D), streak = calcLossStreak(D);
+  gates.push({ name:'7d Net P&L', val:'$'+pnl7d.toFixed(2), pass:pnl7d>0 });
+  gates.push({ name:'Recovery Factor', val:rf>=99?'∞':rf.toFixed(1), pass:rf>=1.5 });
+  gates.push({ name:'Loss Streak', val:streak+'d', pass:streak<4 });
+  if(L.eurCorr!==undefined) gates.push({ name:'EUR Correlation', val:L.eurCorr?'YES':'No', pass:!L.eurCorr });
+
+  if (L.pairs) for (const p of L.pairs) {
+    const adxPct = p.adxR>0?(p.adx/p.adxR*100):0;
+    const grid = Math.max(p.buyN||0,p.sellN||0);
+    const maxDepth = Math.max(p.buyDepth||0,p.sellDepth||0);
+    const maxAge = Math.max(p.oldBuyAge||0,p.oldSellAge||0);
+    gates.push({ name:p.n+' ADX', val:adxPct.toFixed(0)+'%', pass:adxPct<70 });
+    gates.push({ name:p.n+' ATR', val:p.atrR.toFixed(2)+'x', pass:p.atrR<1.1 });
+    gates.push({ name:p.n+' Grid Count', val:grid.toString(), pass:grid<=4 });
+    gates.push({ name:p.n+' Grid Depth', val:maxDepth>0?maxDepth.toFixed(0)+'p':'0p', pass:maxDepth<=20 });
+    gates.push({ name:p.n+' Trade Age', val:maxAge>0?Math.floor(maxAge/60)+'h':'0h', pass:maxAge<=360 });
+  }
+  return gates;
+}
+
+// ============================================================
+// PAIRS tab
+// ============================================================
+function renderPairs() {
+  const el = document.getElementById('p-pairs');
+  if (!S.data || !S.data.latest || !S.data.latest.pairs) { el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest, D = S.data.daily || [];
+  let h = '<div class="g3">';
+
+  for (const p of L.pairs) {
+    const pDaily = D.filter(d => d.pair === p.n);
+    const totalPnl = pDaily.reduce((s,d)=>s+(d.pnl||0),0);
+    const daysActive = new Set(pDaily.map(d=>d.date)).size;
+    const dailyRate = daysActive>0?totalPnl/daysActive:0;
+    const todayData = pDaily.find(d=>d.date===(L.day||''));
+    const todayPnl = todayData?todayData.pnl:0;
+
+    const cond = pairCondition(p);
+    const adxPct = p.adxR>0?p.adx/p.adxR:0;
+    const adxCol = adxPct>=0.8?'var(--red)':adxPct>=0.7?'var(--amb)':'var(--grn)';
+    const maxDepth = Math.max(p.buyDepth||0,p.sellDepth||0);
+    const maxAge = Math.max(p.oldBuyAge||0,p.oldSellAge||0);
+    const prcPct = p.prcPct||50;
+    const rsi = p.rsi||50;
+    const swap = p.swap||0;
+    const exp = calcExpectancy(pDaily, null);
+
+    h += `<div class="pcard">
+      <div class="pcard-hdr"><span class="pcard-name">${p.n}</span>
+        <span class="cond" style="background:${cond.col}22;color:${cond.col}">${cond.label}</span></div>`;
+
+    h += `<div class="badge">
+      <span class="bdg" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
+      ${(p.adxH4||0)>20?'<span class="bdg" style="background:var(--cyn2);color:var(--cyn)">H4:'+p.adxH4.toFixed(0)+'</span>':''}
+      <span class="bdg" style="background:var(--sf2);color:${p.emaBull?'var(--grn)':'var(--red)'}">${p.emaBull?'▲ BULL':'▼ BEAR'}</span>
+      <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
+      ${swap<-0.01?'<span class="bdg" style="background:var(--amb2);color:var(--amb)">SWAP $'+swap.toFixed(2)+'</span>':''}
+    </div>`;
+
+    h += `<div class="mg mg3 mt4">
+      <div class="m"><div class="m-l">Float</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Today</div><div class="m-v ${todayPnl>=0?'pos':'neg'}">$${todayPnl.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Total</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
+    </div>`;
+
+    h += `<div class="mg mg4 mt4">
+      <div class="m"><div class="m-l">Depth</div><div class="m-v ${maxDepth>50?'neg':maxDepth>20?'warn':''}">${maxDepth>0?maxDepth.toFixed(0)+'p':'—'}</div></div>
+      <div class="m"><div class="m-l">RSI</div><div class="m-v ${rsi>70||rsi<30?'warn':''}">${rsi.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">$/day</div><div class="m-v ${dailyRate>=0?'pos':'neg'}">${dailyRate.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Grid</div><div class="m-v">${p.buyN||0}B/${p.sellN||0}S</div></div>
+    </div>`;
+
+    // Price percentile
+    h += `<div style="margin:6px 0"><div class="fxb" style="font-size:8px;color:var(--dim)"><span>Low</span><span>Price in 20d Range</span><span>High</span></div>
+      <div class="pctl-bar"><div class="pctl-dot" style="left:${prcPct}%"></div></div></div>`;
+
+    // Expectancy
+    if (exp) {
+      h += `<div class="fxb mt4" style="font-size:9px">
+        <span class="dim">Exp: <span class="${exp.exp>=0?'pos':'neg'}" style="font-weight:600">$${exp.exp.toFixed(3)}</span></span>
+        <span class="dim">PF: <span style="font-weight:600">${exp.pf>=99?'∞':exp.pf.toFixed(2)}</span></span>
+        <span class="dim">WR: ${(exp.winRate*100).toFixed(0)}%</span>
+      </div>`;
     }
-    h+='</tbody></table></div>';
-  }
 
-  // Withdrawal log
-  if(S.withdrawals.length) {
-    h+=`<div class="card"><div class="card-t">Withdrawals</div>`;
-    for(const w of [...S.withdrawals].reverse()) {
-      h+=`<div class="row"><span class="row-l">${w.date}</span><span class="row-v">$${w.amount.toFixed(2)}</span></div>`;
+    if (maxAge > 360) h += `<div class="dim mt4" style="font-size:9px">⏱ Oldest trade: ${Math.floor(maxAge/60)}h</div>`;
+    h += `<div class="dim mt4" style="font-size:9px">${daysActive}d active · Range ${(p.rngPct||0).toFixed(0)}% consumed</div>`;
+    h += '</div>';
+  }
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+// ============================================================
+// MARKET tab
+// ============================================================
+function renderMarket() {
+  const el = document.getElementById('p-market');
+  if (!S.data || !S.data.latest || !S.data.latest.pairs) { el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest;
+  let h = '';
+
+  // Session + EUR correlation
+  h += `<div class="card"><div class="fxb">
+    <div><div class="card-t" style="margin:0">Market Context</div></div>
+    <div class="fx gap8">
+      <span class="session-badge">${(L.session||'--').toUpperCase()}</span>
+      <span class="pill" style="background:${L.eurCorr?'var(--amb2)':'var(--grn2)'};color:${L.eurCorr?'var(--amb)':'var(--grn)'};border:1px solid ${L.eurCorr?'var(--ambB)':'var(--grnB)'}">EUR Corr: ${L.eurCorr?'YES':'No'}</span>
+    </div>
+  </div>
+  <div class="dim" style="font-size:9px">GMT ${L.hour||0}:00 · Day ${L.dow||0} · ${(S.indicators||[]).length} indicator snapshots loaded (7d)</div>
+  </div>`;
+
+  // Per-pair indicator panels
+  h += '<div class="g3">';
+  for (const p of L.pairs) {
+    const adxPct = p.adxR>0?(p.adx/p.adxR*100):0;
+    const h4Pct = 50; // normalize H4 ADX to a gauge
+    const rsi = p.rsi||50;
+    const bbw = p.bbw||0;
+    const adxSlp = p.adxSlp||0;
+    const prcPct = p.prcPct||50;
+    const rngPct = p.rngPct||0;
+    const tickVol = p.tickVol||0;
+    const cond = pairCondition(p);
+
+    h += `<div class="pcard">
+      <div class="pcard-hdr"><span class="pcard-name">${p.n}</span>
+        <span class="cond" style="background:${cond.col}22;color:${cond.col}">${cond.label}</span></div>`;
+
+    // ADX H1
+    h += `<div class="gauge"><span class="gauge-label">ADX H1</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${Math.min(100,adxPct).toFixed(0)}%;background:${adxPct>=80?'var(--red)':adxPct>=70?'var(--amb)':'var(--grn)'}"></div></div>
+      <span class="gauge-val">${p.adx.toFixed(0)} <span class="dim">/${p.adxR}</span></span></div>`;
+
+    // ADX slope
+    h += `<div class="gauge"><span class="gauge-label">ADX Slope</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${Math.min(100,Math.abs(adxSlp)*20).toFixed(0)}%;background:${adxSlp>0?'var(--red)':'var(--grn)'}"></div></div>
+      <span class="gauge-val ${adxSlp>0?'neg':'pos'}">${adxSlp>0?'↑':'↓'} ${Math.abs(adxSlp).toFixed(1)}</span></div>`;
+
+    // H4 ADX
+    h += `<div class="gauge"><span class="gauge-label">ADX H4</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${Math.min(100,(p.adxH4||0)/50*100).toFixed(0)}%;background:${(p.adxH4||0)>25?'var(--amb)':'var(--grn)'}"></div></div>
+      <span class="gauge-val">${(p.adxH4||0).toFixed(0)}</span></div>`;
+
+    // RSI
+    const rsiCol = rsi>70?'var(--red)':rsi<30?'var(--red)':'var(--grn)';
+    h += `<div class="gauge"><span class="gauge-label">RSI</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${rsi.toFixed(0)}%;background:${rsiCol}"></div></div>
+      <span class="gauge-val">${rsi.toFixed(0)}</span></div>`;
+
+    // BBW
+    h += `<div class="gauge"><span class="gauge-label">BBW</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${Math.min(100,bbw*5000).toFixed(0)}%;background:${bbw>0.015?'var(--amb)':bbw<0.005?'var(--grn)':'var(--blu)'}"></div></div>
+      <span class="gauge-val">${(bbw*100).toFixed(2)}%</span></div>`;
+
+    // Price percentile
+    h += `<div class="gauge"><span class="gauge-label">Price Pctl</span>
+      <div class="gauge-bar" style="background:linear-gradient(90deg,var(--red2),var(--sf2) 30%,var(--sf2) 70%,var(--red2))">
+        <div style="position:absolute;left:${prcPct}%;width:3px;height:8px;background:var(--blu);border-radius:2px;transform:translateX(-50%)"></div>
+      </div>
+      <span class="gauge-val">${prcPct.toFixed(0)}%</span></div>`;
+
+    // Range consumed
+    h += `<div class="gauge"><span class="gauge-label">Range Used</span>
+      <div class="gauge-bar"><div class="gauge-fill" style="width:${rngPct.toFixed(0)}%;background:${rngPct>80?'var(--grn)':'var(--blu)'}"></div></div>
+      <span class="gauge-val">${rngPct.toFixed(0)}%</span></div>`;
+
+    // Trend + volume summary
+    const h1Bull = (p.diP||0)>(p.diM||0);
+    const h4Bull = (p.diPH4||0)>(p.diMH4||0);
+    h += `<div class="fxb mt4" style="font-size:9px">
+      <span>EMA: ${p.emaBull?'<span class="pos">Bull</span>':'<span class="neg">Bear</span>'}</span>
+      <span>H1: ${h1Bull?'<span class="pos">↑</span>':'<span class="neg">↓</span>'} H4: ${h4Bull?'<span class="pos">↑</span>':'<span class="neg">↓</span>'}</span>
+      <span class="dim">Vol: ${tickVol}</span>
+    </div>`;
+
+    h += '</div>';
+  }
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// STRATEGY tab
+// ============================================================
+function renderStrategy() {
+  const el = document.getElementById('p-strategy');
+  if (!S.data || !S.data.latest) { el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest, tm = L.tm||{}, D = S.data.daily||[];
+  let h = '';
+
+  h += '<div class="g2">';
+
+  // TM Status
+  h += `<div class="card"><div class="card-t">Trade Manager</div>
+    <div class="mg mg2">
+      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'Online':'Offline'}</div></div>
+      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def?'DEFENSIVE':'Normal'}</div></div>
+    </div>
+    <div class="mg mg4">
+      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
+      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
+      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
+      <div class="m"><div class="m-l">Float Blk</div><div class="m-v">${tm.dayF||0}</div></div>
+    </div>
+    <div class="row"><span class="row-l">DD Soft Limit</span><span class="row-v">${tm.ddSoft||15}%</span></div>
+    <div class="row"><span class="row-l">Max Trades</span><span class="row-v">${tm.maxT||50}</span></div>
+    <div class="row"><span class="row-l">Equity Floor</span><span class="row-v">$${L.acct.floor.toFixed(0)}</span></div>
+  </div>`;
+
+  // Strategy metrics — REAL expectancy
+  const allExp = calcExpectancy(D);
+  const totalPnl = D.reduce((s,d)=>s+(d.pnl||0),0);
+  const totalDays = new Set(D.map(d=>d.date)).size;
+  const pnl7d = calc7dPnl(D);
+  const rfVal = calcRF(D);
+  const streak = calcLossStreak(D);
+
+  h += `<div class="card"><div class="card-t">Strategy Metrics</div>
+    <div class="mg mg3">
+      <div class="m"><div class="m-l">Total P&L</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">$/day</div><div class="m-v">${totalDays>0?(totalPnl/totalDays).toFixed(2):'—'}</div></div>
+    </div>`;
+  if (allExp) {
+    h += `<div class="mg mg3">
+      <div class="m"><div class="m-l">Expectancy</div><div class="m-v ${allExp.exp>=0?'pos':'neg'}">$${allExp.exp.toFixed(3)}</div></div>
+      <div class="m"><div class="m-l">Profit Factor</div><div class="m-v">${allExp.pf>=99?'∞':allExp.pf.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Win Rate</div><div class="m-v">${(allExp.winRate*100).toFixed(0)}%</div></div>
+    </div>
+    <div class="mg mg3">
+      <div class="m"><div class="m-l">Avg Win</div><div class="m-v pos">$${allExp.avgWin.toFixed(3)}</div></div>
+      <div class="m"><div class="m-l">Avg Loss</div><div class="m-v neg">$${allExp.avgLoss.toFixed(3)}</div></div>
+      <div class="m"><div class="m-l">Trades</div><div class="m-v">${allExp.totalWins+allExp.totalLosses}</div></div>
+    </div>`;
+  }
+  h += `<div class="mg mg2">
+    <div class="m"><div class="m-l">Recovery Factor</div><div class="m-v">${rfVal>=99?'∞':rfVal.toFixed(1)}</div></div>
+    <div class="m"><div class="m-l">Loss Streak</div><div class="m-v ${streak>=4?'neg':''}">${streak}d</div></div>
+  </div>
+  <div class="dim" style="font-size:8px">Expectancy and PF use real grossWin/grossLoss from trade data</div>
+  </div>`;
+
+  h += '</div>'; // close g2
+
+  // Pair ranking table
+  if (L.pairs && L.pairs.length > 1) {
+    h += `<div class="card"><div class="card-t">Pair Ranking (by $/day)</div><table>
+      <tr><th>Pair</th><th class="tar">Total P&L</th><th class="tar">$/day</th><th class="tar">Expectancy</th><th class="tar">PF</th><th class="tar">Win Rate</th><th class="tar">BCR</th><th class="tar">Days</th></tr>`;
+
+    const pairStats = L.pairs.map(p => {
+      const pd = D.filter(d=>d.pair===p.n);
+      const tPnl = pd.reduce((s,d)=>s+(d.pnl||0),0);
+      const days = new Set(pd.map(d=>d.date)).size;
+      const exp = calcExpectancy(pd, null);
+      // BCR using real grossWin
+      const totalGWin = pd.reduce((s,d)=>s+(d.grossWin||0),0);
+      const totalBlkPnl = pd.reduce((s,d)=>s+Math.abs(d.blkPnl||0),0);
+      const bcr = totalGWin>0?(totalBlkPnl/totalGWin*100):0;
+      return { n:p.n, tPnl, days, daily:days>0?tPnl/days:0, exp, bcr };
+    }).sort((a,b) => b.daily - a.daily);
+
+    for (const ps of pairStats) {
+      h += `<tr><td style="font-weight:700">${ps.n}</td>
+        <td class="tar ${ps.tPnl>=0?'pos':'neg'}">$${ps.tPnl.toFixed(2)}</td>
+        <td class="tar ${ps.daily>=0?'pos':'neg'}">${ps.daily.toFixed(2)}</td>
+        <td class="tar">${ps.exp?'$'+ps.exp.exp.toFixed(3):'—'}</td>
+        <td class="tar">${ps.exp?(ps.exp.pf>=99?'∞':ps.exp.pf.toFixed(2)):'—'}</td>
+        <td class="tar">${ps.exp?(ps.exp.winRate*100).toFixed(0)+'%':'—'}</td>
+        <td class="tar ${ps.bcr>20?'neg':ps.bcr>10?'warn':''}">${ps.bcr.toFixed(1)}%</td>
+        <td class="tar dim">${ps.days}</td></tr>`;
     }
-    h+='</div>';
+    h += '</table></div>';
   }
 
-  el.innerHTML=h;
+  el.innerHTML = h;
+}
+
+// ============================================================
+// HISTORY tab
+// ============================================================
+function renderHistory() {
+  const el = document.getElementById('p-history');
+  if (!S.data) { el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const D = S.data.daily||[], snaps = S.data.snapshots||[];
+  let h = '';
+
+  // Summary row
+  const totalPnl = D.reduce((s,d)=>s+(d.pnl||0),0);
+  const totalDays = new Set(D.map(d=>d.date)).size;
+  const pnl7d = calc7dPnl(D);
+  const totalWd = S.withdrawals.reduce((s,w)=>s+w.amt,0);
+
+  h += `<div class="card"><div class="mg mg4">
+    <div class="m"><div class="m-l">All-Time P&L</div><div class="m-v ${totalPnl>=0?'pos':'neg'}" style="font-size:20px">$${totalPnl.toFixed(2)}</div></div>
+    <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
+    <div class="m"><div class="m-l">$/day avg</div><div class="m-v">${totalDays>0?(totalPnl/totalDays).toFixed(2):'—'}</div></div>
+    <div class="m"><div class="m-l">Withdrawn</div><div class="m-v">$${totalWd.toFixed(0)}</div></div>
+  </div></div>`;
+
+  // Equity chart
+  if (snaps.length > 2) {
+    h += `<div class="card"><div class="card-t">Equity (${snaps.length} snapshots)</div>
+      <div class="chart-wrap">${renderEquityChart(snaps)}</div></div>`;
+  }
+
+  // Daily P&L bars
+  const byDate = {};
+  for (const d of D) { byDate[d.date] = (byDate[d.date]||0) + (d.pnl||0); }
+  const dates = Object.keys(byDate).sort();
+  if (dates.length > 0) {
+    h += `<div class="card"><div class="card-t">Daily P&L</div>
+      <div class="chart-wrap">${renderDailyBars(dates, byDate)}</div></div>`;
+  }
+
+  // Cumulative P&L
+  if (dates.length > 1) {
+    h += `<div class="card"><div class="card-t">Cumulative P&L</div>
+      <div class="chart-wrap">${renderCumPnl(dates, byDate)}</div></div>`;
+  }
+
+  // Daily table
+  if (dates.length > 0) {
+    h += `<div class="card"><div class="card-t">Daily Detail (${dates.length} days)</div><table>
+      <tr><th>Date</th><th class="tar">P&L</th><th class="tar">Wins</th><th class="tar">Losses</th><th class="tar">Closed</th></tr>`;
+    for (const dt of [...dates].reverse()) {
+      const pnl = byDate[dt];
+      const dayPairs = D.filter(d=>d.date===dt);
+      const wins = dayPairs.reduce((s,d)=>s+(d.wins||0),0);
+      const losses = dayPairs.reduce((s,d)=>s+(d.losses||0),0);
+      h += `<tr><td>${dt}</td><td class="tar ${pnl>=0?'pos':'neg'}" style="font-weight:600">$${pnl.toFixed(2)}</td>
+        <td class="tar pos">${wins}</td><td class="tar neg">${losses}</td><td class="tar dim">${wins+losses}</td></tr>`;
+    }
+    h += '</table></div>';
+  }
+
+  // Withdrawals
+  h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Withdrawals ($${totalWd.toFixed(0)})</div>
+    <button class="btn-sm" onclick="addWithdrawal()">+ Add</button></div>`;
+  if (S.withdrawals.length > 0) {
+    for (const w of [...S.withdrawals].reverse()) {
+      h += `<div class="row"><span class="row-l">${w.date}</span><span class="row-v">$${w.amt.toFixed(0)}</span></div>`;
+    }
+  } else { h += '<div class="dim tac" style="padding:12px;font-size:10px">No withdrawals recorded</div>'; }
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// LAB tab (placeholder)
+// ============================================================
+function renderLab() {
+  document.getElementById('p-lab').innerHTML = `<div class="lab-placeholder">
+    <h3>LAB</h3>
+    <p>This tab will contain pair comparison tools for evaluating alternative currency pairs.</p>
+    <p style="color:var(--mt)"><strong>Planned features:</strong></p>
+    <p>Demo account pair performance comparison · Watchlist indicator screening for candidate pairs · Backtest result analysis</p>
+    <p style="margin-top:20px;color:var(--bd)">Coming in a future update</p>
+  </div>`;
 }
 
 // ============================================================
 // Charts
 // ============================================================
-function renderSparkline() {
-  if(!S.data||!S.data.snapshots||S.data.snapshots.length<3) return '';
-  const snaps=S.data.snapshots.slice(-60);
-  const eqs=snaps.map(s=>s.eq), mn=Math.min(...eqs)*0.999, mx=Math.max(...eqs)*1.001;
-  const w=400,h2=35;
-  const pts=eqs.map((v,i)=>{const x=i/(eqs.length-1)*w;const y=h2-(v-mn)/(mx-mn)*h2;return`${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h2}" style="width:100%;height:35px;margin-top:6px"><polyline points="${pts}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
-}
-
-function renderEquityChart(snaps,W=500,H=150) {
-  const P=30;
-  const bals=snaps.map(s=>s.bal), eqs=snaps.map(s=>s.eq);
-  const all=[...bals,...eqs], mn=Math.min(...all)*0.998, mx=Math.max(...all)*1.002, rng=mx-mn||1;
-  function pts(arr){return arr.map((v,i)=>{const x=P+(i/(arr.length-1))*(W-P*2);const y=10+(1-(v-mn)/rng)*(H-20);return`${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');}
-  let labs='';
-  for(let i=0;i<=4;i++){const v=mn+(rng*i/4);const y=10+(1-i/4)*(H-20);
-    labs+=`<text x="${P-4}" y="${y+3}" fill="var(--mt)" font-size="8" text-anchor="end">$${v.toFixed(0)}</text>`;
-    labs+=`<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="var(--bd)" stroke-width="0.5"/>`;}
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">${labs}
+function renderEquityChart(snaps) {
+  const W=500, H=140, P=30;
+  const eqs=snaps.map(s=>s.eq), bals=snaps.map(s=>s.bal);
+  const all=[...bals,...eqs]; const min=Math.min(...all)*0.998, max=Math.max(...all)*1.002, range=max-min||1;
+  function pts(arr){ return arr.map((v,i)=>{const x=P+(i/(arr.length-1))*(W-P*2);const y=P/2+(1-(v-min)/range)*(H-P);return x.toFixed(1)+','+y.toFixed(1);}).join(' '); }
+  let labels='';
+  for(let i=0;i<=4;i++){const val=min+(range*i/4);const y=P/2+(1-i/4)*(H-P);
+    labels+=`<text x="${P-4}" y="${y+3}" fill="var(--mt)" font-size="8" text-anchor="end">$${val.toFixed(0)}</text>`;
+    labels+=`<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="var(--bd)" stroke-width="0.5"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:140px">${labels}
     <polyline points="${pts(bals)}" fill="none" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3,2"/>
     <polyline points="${pts(eqs)}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/>
   </svg><div class="fxb dim" style="font-size:8px"><span>— Balance</span><span style="color:var(--blu)">— Equity</span></div>`;
 }
 
-function renderDailyBars(dates,bd,W=500,H=130) {
-  const P=30, vals=dates.map(d=>bd[d]), mxA=Math.max(1,...vals.map(Math.abs));
-  const bw=Math.max(2,Math.min(14,(W-P*2)/dates.length-1)), mid=H/2;
+function renderDailyBars(dates, byDate) {
+  const W=500, H=100, P=30;
+  const vals=dates.map(d=>byDate[d]); const maxAbs=Math.max(1,...vals.map(Math.abs));
+  const barW=Math.max(2,Math.min(14,(W-P*2)/dates.length-1)); const mid=H/2;
   let bars='';
   for(let i=0;i<dates.length;i++){const v=vals[i];const x=P+(i/dates.length)*(W-P*2);
-    const bh=Math.abs(v)/mxA*(H/2-5);const y=v>=0?mid-bh:mid;const c=v>=0?'var(--grn)':'var(--red)';
-    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${Math.max(1,bh).toFixed(1)}" fill="${c}" rx="1"/>`;}
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
+    const barH=Math.abs(v)/maxAbs*(H/2-5);const y=v>=0?mid-barH:mid;const col=v>=0?'var(--grn)':'var(--red)';
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${Math.max(1,barH).toFixed(1)}" fill="${col}" rx="1"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100px">
     <line x1="${P}" y1="${mid}" x2="${W-P}" y2="${mid}" stroke="var(--mt)" stroke-width="0.5"/>
     <text x="${P-4}" y="${mid+3}" fill="var(--mt)" font-size="8" text-anchor="end">$0</text>
-    <text x="${P-4}" y="12" fill="var(--mt)" font-size="8" text-anchor="end">+$${mxA.toFixed(0)}</text>
-    <text x="${P-4}" y="${H-2}" fill="var(--mt)" font-size="8" text-anchor="end">-$${mxA.toFixed(0)}</text>
+    <text x="${P-4}" y="12" fill="var(--mt)" font-size="8" text-anchor="end">+$${maxAbs.toFixed(0)}</text>
+    <text x="${P-4}" y="${H-2}" fill="var(--mt)" font-size="8" text-anchor="end">-$${maxAbs.toFixed(0)}</text>
     ${bars}</svg>`;
 }
 
+function renderCumPnl(dates, byDate) {
+  const W=500, H=120, P=30;
+  let cum=0; const vals=[]; for(const dt of dates){cum+=byDate[dt];vals.push(cum);}
+  const min=Math.min(0,...vals), max=Math.max(0,...vals); const range=max-min||1;
+  const pts=vals.map((v,i)=>{const x=P+(i/(vals.length-1))*(W-P*2);const y=P/2+(1-(v-min)/range)*(H-P);return x.toFixed(1)+','+y.toFixed(1);}).join(' ');
+  // Zero line
+  const zeroY=P/2+(1-(0-min)/range)*(H-P);
+  let labels='';
+  for(let i=0;i<=4;i++){const val=min+(range*i/4);const y=P/2+(1-i/4)*(H-P);
+    labels+=`<text x="${P-4}" y="${y+3}" fill="var(--mt)" font-size="8" text-anchor="end">$${val.toFixed(0)}</text>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:120px">${labels}
+    <line x1="${P}" y1="${zeroY}" x2="${W-P}" y2="${zeroY}" stroke="var(--mt)" stroke-width="0.5" stroke-dasharray="3,2"/>
+    <polyline points="${pts}" fill="none" stroke="var(--grn)" stroke-width="2" stroke-linejoin="round"/>
+  </svg>`;
+}
+
 // ============================================================
-// Withdrawal modal
+// Withdrawal tracking
 // ============================================================
-function showWdModal() {
-  const today=new Date().toISOString().substring(0,10);
-  document.getElementById('modal').innerHTML = `<div class="modal-bg" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-      <h3>Record Withdrawal</h3>
-      <input type="number" id="wdAmt" placeholder="Amount ($)" step="0.01">
-      <input type="date" id="wdDate" value="${today}">
-      <div style="margin-top:8px"><button onclick="saveWd()">Save</button><button class="btn-cancel" onclick="closeModal()">Cancel</button></div>
-    </div></div>`;
+function addWithdrawal() {
+  const amt = prompt('Withdrawal amount ($):');
+  if (!amt || isNaN(parseFloat(amt))) return;
+  const date = prompt('Date (YYYY.MM.DD):', new Date().toISOString().substring(0,10).replace(/-/g,'.'));
+  if (!date) return;
+  S.withdrawals.push({ amt: parseFloat(amt), date });
+  localStorage.setItem('tm_wd', JSON.stringify(S.withdrawals));
+  render();
 }
 
-function saveWd() {
-  const amt=parseFloat(document.getElementById('wdAmt').value);
-  const date=document.getElementById('wdDate').value;
-  if(!amt||amt<=0) return;
-  S.withdrawals.push({amount:amt,date:date});
-  localStorage.setItem('tm_wd',JSON.stringify(S.withdrawals));
-  closeModal();
-  renderHist();
+// ============================================================
+// Demo Mode
+// ============================================================
+function loadDemo() {
+  const now = new Date();
+  const ts = now.toISOString().replace('T',' ').substring(0,19);
+  const day = now.toISOString().substring(0,10).replace(/-/g,'.');
+
+  S.data = {
+    status: 'ok',
+    latest: {
+      ts, day,
+      acct: { bal:512.38, eq:507.14, dd:4.2, peak:518.60, floor:300, margin:12.40, baseLots:0.01 },
+      tm: { active:true, def:false, ddSoft:15, defDD:10, maxT:50, dayA:18, dayB:3, dayC:1, dayF:0, kill:false },
+      totalOpen: 9,
+      session: 'London',
+      hour: 10, dow: 3,
+      eurCorr: false,
+      pairs: [
+        {
+          n:'EURUSD', adx:22.4, adxR:30, diP:18.1, diM:14.3, brk:false,
+          adxSlp:-0.8, adxH4:19.2, diPH4:16.5, diMH4:13.8,
+          rsi:54.2, bbw:0.0042, emaBull:true, atrR:0.92,
+          rngPct:62, prcPct:58, tickVol:1840, spd:1.2,
+          buyN:2, sellN:1, buyLot:0.02, sellLot:0.01,
+          buyDepth:12.4, sellDepth:5.8, oldBuyAge:185, oldSellAge:42,
+          buyVel:0, sellVel:0, floatPnl:-2.18, swap:-0.04,
+          fb:false, cdB:false, cdS:false
+        },
+        {
+          n:'EURGBP', adx:18.6, adxR:30, diP:12.4, diM:15.9, brk:false,
+          adxSlp:0.3, adxH4:14.1, diPH4:11.2, diMH4:13.6,
+          rsi:42.8, bbw:0.0031, emaBull:false, atrR:0.78,
+          rngPct:44, prcPct:35, tickVol:920, spd:1.8,
+          buyN:1, sellN:0, buyLot:0.01, sellLot:0,
+          buyDepth:8.2, sellDepth:0, oldBuyAge:95, oldSellAge:0,
+          buyVel:0, sellVel:0, floatPnl:-0.86, swap:0,
+          fb:false, cdB:false, cdS:false
+        },
+        {
+          n:'GBPAUD', adx:31.5, adxR:40, diP:24.8, diM:16.2, brk:false,
+          adxSlp:1.4, adxH4:28.3, diPH4:22.1, diMH4:14.5,
+          rsi:64.8, bbw:0.0098, emaBull:true, atrR:1.08,
+          rngPct:71, prcPct:72, tickVol:2450, spd:3.1,
+          buyN:1, sellN:4, buyLot:0.01, sellLot:0.04,
+          buyDepth:0, sellDepth:38.6, oldBuyAge:28, oldSellAge:520,
+          buyVel:0, sellVel:1, floatPnl:-5.24, swap:-0.18,
+          fb:false, cdB:false, cdS:false
+        }
+      ],
+      trades: [
+        { pr:'EURUSD', ty:'B', lt:0.01, pl:-1.42, op:1.08420, dur:185, sl:1.07920 },
+        { pr:'EURUSD', ty:'B', lt:0.01, pl:-0.76, op:1.08544, dur:88, sl:1.08044 },
+        { pr:'EURUSD', ty:'S', lt:0.01, pl:0.34, op:1.08610, dur:42, sl:1.09110 },
+        { pr:'EURGBP', ty:'B', lt:0.01, pl:-0.86, op:0.85620, dur:95, sl:0.85120 },
+        { pr:'GBPAUD', ty:'B', lt:0.01, pl:1.12, op:1.94280, dur:28, sl:0 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-0.82, op:1.94680, dur:520, sl:1.95880 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-1.64, op:1.95040, dur:410, sl:1.96240 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-2.18, op:1.95380, dur:290, sl:1.96580 },
+        { pr:'GBPAUD', ty:'S', lt:0.01, pl:-0.60, op:1.94820, dur:155, sl:1.96020 },
+      ]
+    },
+    snapshots: generateDemoSnapshots(now),
+    daily: generateDemoDaily(now)
+  };
+  S.indicators = generateDemoIndicators(now);
+  S.err = null;
+  showDashboard();
+  render();
 }
 
-function closeModal(e) {
-  if(e&&e.target!==e.currentTarget) return;
-  document.getElementById('modal').innerHTML='';
+function generateDemoSnapshots(now) {
+  const snaps = [];
+  const baseEq = 502, baseBal = 510;
+  for (let i = 480; i >= 0; i--) {
+    const t = new Date(now.getTime() - i * 180000);
+    const noise = Math.sin(i * 0.05) * 4 + Math.random() * 3 - 1.5;
+    const trend = (480 - i) * 0.01;
+    const eq = baseEq + noise + trend;
+    const bal = baseBal + trend + (Math.random() > 0.85 ? 0.2 : 0);
+    snaps.push({
+      ts: t.toISOString().replace('T',' ').substring(0,19),
+      bal: parseFloat(bal.toFixed(2)),
+      eq: parseFloat(eq.toFixed(2)),
+      dd: parseFloat((Math.max(0, (bal - eq) / bal * 100)).toFixed(2)),
+      trades: 6 + Math.floor(Math.random() * 6),
+      def: 0, hour: t.getUTCHours(), dow: t.getUTCDay(),
+      session: t.getUTCHours() >= 7 && t.getUTCHours() < 12 ? 'London' : t.getUTCHours() >= 12 && t.getUTCHours() < 16 ? 'Overlap' : t.getUTCHours() >= 16 && t.getUTCHours() < 21 ? 'NY' : 'Asian',
+      eurCorr: 0
+    });
+  }
+  return snaps;
 }
 
-function disconnect() {
-  localStorage.removeItem('tm_url');
-  S.url=''; S.data=null;
-  clearTimeout(S.timer);
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('connectScreen').classList.remove('hidden');
+function generateDemoDaily(now) {
+  const pairs = ['EURUSD','EURGBP','GBPAUD'];
+  const daily = [];
+  for (let d = 13; d >= 0; d--) {
+    const dt = new Date(now.getTime() - d * 86400000);
+    const dateStr = dt.toISOString().substring(0,10).replace(/-/g,'.');
+    for (const pair of pairs) {
+      const base = pair === 'EURUSD' ? 0.6 : pair === 'EURGBP' ? 0.35 : 0.25;
+      const variance = (Math.random() - 0.4) * 1.5;
+      const pnl = parseFloat((base + variance).toFixed(2));
+      const wins = 3 + Math.floor(Math.random() * 8);
+      const losses = 1 + Math.floor(Math.random() * 4);
+      const gWin = parseFloat((wins * (0.15 + Math.random() * 0.12)).toFixed(2));
+      const gLoss = parseFloat((losses * (0.08 + Math.random() * 0.10)).toFixed(2));
+      const blkC = Math.random() > 0.7 ? Math.floor(Math.random() * 3) : 0;
+      const blkPnl = blkC > 0 ? parseFloat((-blkC * (0.05 + Math.random() * 0.08)).toFixed(2)) : 0;
+      daily.push({
+        date: dateStr, pair,
+        pnl, wins, losses, closed: wins + losses,
+        avgDur: 30 + Math.floor(Math.random() * 120),
+        blkClosed: blkC, blkPnl,
+        bal: 500 + (13 - d) * 0.9,
+        eq: 498 + (13 - d) * 0.85,
+        peak: 500 + (13 - d) * 0.95,
+        grossWin: gWin, grossLoss: gLoss
+      });
+    }
+  }
+  return daily;
+}
+
+function generateDemoIndicators(now) {
+  const pairs = ['EURUSD','EURGBP','GBPAUD'];
+  const indicators = [];
+  for (let i = 336; i >= 0; i--) { // 7 days at 3-min = ~3360 but sampling every 10th
+    if (i % 10 !== 0) continue;
+    const t = new Date(now.getTime() - i * 180000);
+    for (const pair of pairs) {
+      indicators.push({
+        ts: t.toISOString().replace('T',' ').substring(0,19),
+        pair, adx: 18 + Math.random() * 20,
+        rsi: 35 + Math.random() * 30,
+        bbw: 0.003 + Math.random() * 0.01,
+        adxH4: 15 + Math.random() * 15,
+        prcPct: 20 + Math.random() * 60
+      });
+    }
+  }
+  return indicators;
 }
 </script>
 </body>
