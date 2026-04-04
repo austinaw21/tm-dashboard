@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TM Dashboard — Desktop</title>
+<style>
+:root{
+  --bg:#0a0e17;--sf:#111827;--sf2:#1a2235;--bd:#1e293b;
+  --tx:#e2e8f0;--dim:#94a3b8;--mt:#64748b;
+  --grn:#22c55e;--grn2:rgba(34,197,94,.12);--grnB:rgba(34,197,94,.3);
+  --amb:#f59e0b;--amb2:rgba(245,158,11,.12);--ambB:rgba(245,158,11,.3);
+  --red:#ef4444;--red2:rgba(239,68,68,.12);--redB:rgba(239,68,68,.3);
+  --blu:#3b82f6;--blu2:rgba(59,130,246,.1);--bluB:rgba(59,130,246,.3);
+  --r:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','JetBrains Mono','Courier New',monospace;
+  max-width:1200px;margin:0 auto;min-height:100vh;font-size:12px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* Top strip — always visible */
+.strip{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--bd);padding:8px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.strip-title{font-size:14px;font-weight:700;letter-spacing:.5px}
+.strip-title .a{color:var(--blu)}
+.strip-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:4px}
+.strip-metrics{display:flex;gap:14px;font-size:11px;flex:1}
+.strip-metrics .lbl{color:var(--mt);margin-right:3px}
+.strip-metrics .val{font-weight:700}
+.strip-right{display:flex;gap:10px;align-items:center}
+.pill{display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:.4px}
+.btn-sm{background:var(--sf2);border:1px solid var(--bd);color:var(--dim);font:inherit;font-size:10px;
+  padding:4px 10px;border-radius:5px;cursor:pointer}
+.btn-sm:hover{border-color:var(--mt)}
+
+/* Tabs */
+.tabs{position:sticky;top:42px;z-index:15;background:var(--bg);display:flex;border-bottom:1px solid var(--bd);padding:0 20px}
+.tab{padding:8px 16px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.5px;
+  color:var(--mt);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.on{color:var(--blu);border-bottom-color:var(--blu)}
+
+/* Content */
+.pane{display:none;padding:16px 20px 60px}
+.pane.on{display:block}
+
+/* Cards */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.card-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mt);margin-bottom:10px}
+
+/* Grid layouts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* Metrics */
+.mg{display:grid;gap:6px;margin-bottom:8px}
+.mg2{grid-template-columns:repeat(2,1fr)}.mg3{grid-template-columns:repeat(3,1fr)}
+.mg4{grid-template-columns:repeat(4,1fr)}.mg5{grid-template-columns:repeat(5,1fr)}
+.mg6{grid-template-columns:repeat(6,1fr)}
+.m{background:var(--sf2);border-radius:6px;padding:8px 10px}
+.m-l{font-size:9px;color:var(--dim);margin-bottom:2px}
+.m-v{font-size:16px;font-weight:600}
+
+/* Regime */
+.regime{border-radius:var(--r);padding:10px 14px;margin-bottom:12px;text-align:center;font-weight:700;font-size:14px;letter-spacing:1px}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);
+  padding:6px 8px;border-bottom:1px solid var(--bd)}
+td{padding:6px 8px;border-bottom:1px solid var(--bd)}
+tr:hover{background:var(--sf2)}
+
+/* Row */
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.row+.row{border-top:1px solid var(--bd)}
+.row-l{font-size:10px;color:var(--dim)}
+.row-v{font-size:11px;font-weight:600}
+
+/* Pair cards */
+.pcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.pcard-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pcard-name{font-size:13px;font-weight:700}
+
+/* Badge */
+.badge{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
+.bdg{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
+
+/* Progress bar */
+.pbar{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;margin:4px 0}
+.pbar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* Chart */
+.chart-wrap{background:var(--sf2);border-radius:6px;padding:10px;margin:6px 0}
+svg text{font-family:inherit}
+
+/* Alert */
+.alert{border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:11px;display:flex;gap:8px;align-items:center}
+
+/* Filters */
+.filters{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+select,input[type="date"]{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);font:inherit;font-size:11px;
+  padding:4px 8px;border-radius:5px}
+select:focus,input:focus{outline:none;border-color:var(--blu)}
+
+/* Modal */
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;width:360px;max-width:90vw}
+.modal h3{font-size:13px;margin-bottom:12px}
+.modal input{width:100%;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);font:inherit;font-size:12px;
+  padding:8px;border-radius:5px;margin-bottom:8px}
+.modal button{background:var(--blu);color:#fff;border:none;font:inherit;font-weight:700;font-size:11px;
+  padding:8px 16px;border-radius:5px;cursor:pointer;margin-right:6px}
+.modal .btn-cancel{background:var(--sf2);color:var(--dim);border:1px solid var(--bd)}
+
+/* Connect */
+.connect{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:80vh;padding:40px;text-align:center}
+.connect h2{font-size:18px;margin-bottom:8px}
+.connect p{font-size:11px;color:var(--dim);margin-bottom:20px}
+.connect input{width:400px;max-width:90vw;background:var(--sf);border:1px solid var(--bd);border-radius:6px;
+  color:var(--tx);font:inherit;font-size:12px;padding:10px;margin-bottom:10px}
+.connect input:focus{outline:none;border-color:var(--blu)}
+.connect button{background:var(--blu);color:#fff;border:none;border-radius:6px;
+  font:inherit;font-weight:700;font-size:12px;padding:10px 30px;cursor:pointer}
+
+/* Utility */
+.neg{color:var(--red)}.pos{color:var(--grn)}.warn{color:var(--amb)}
+.dim{color:var(--dim)}.mt4{margin-top:4px}.mt8{margin-top:8px}.mb4{margin-bottom:4px}
+.tac{text-align:center}.tar{text-align:right}
+.fx{display:flex}.fxb{display:flex;justify-content:space-between;align-items:center}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}
+.f1{flex:1}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="connect" id="connectScreen">
+    <h2>TM Dashboard — Desktop</h2>
+    <p>Paste your Google Apps Script URL to connect</p>
+    <input id="urlInput" placeholder="https://script.google.com/macros/s/.../exec" spellcheck="false">
+    <button onclick="saveUrl()">Connect</button>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div class="strip" id="strip"></div>
+    <div class="tabs" id="tabBar">
+      <div class="tab on" data-t="live">LIVE</div>
+      <div class="tab" data-t="lots">LOT SIZING</div>
+      <div class="tab" data-t="pairs">PAIRS</div>
+      <div class="tab" data-t="mgr">MANAGER</div>
+      <div class="tab" data-t="hist">HISTORY</div>
+    </div>
+    <div class="pane on" id="p-live"></div>
+    <div class="pane" id="p-lots"></div>
+    <div class="pane" id="p-pairs"></div>
+    <div class="pane" id="p-mgr"></div>
+    <div class="pane" id="p-hist"></div>
+  </div>
+  <div id="modal"></div>
+</div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+const S = {
+  url: localStorage.getItem('tm_url') || '',
+  data: null,
+  err: null,
+  loading: false,
+  tab: 'live',
+  refreshMs: 180000,
+  timer: null,
+  pairFilter: 'all',
+  withdrawals: JSON.parse(localStorage.getItem('tm_wd') || '[]'),
+};
+
+if (S.url) { showDashboard(); fetchData(); }
+else document.getElementById('connectScreen').classList.remove('hidden');
+
+function saveUrl() {
+  const v = document.getElementById('urlInput').value.trim();
+  if (v.length < 10) return;
+  S.url = v;
+  localStorage.setItem('tm_url', v);
+  showDashboard();
+  fetchData();
+}
+
+function showDashboard() {
+  document.getElementById('connectScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      S.tab = t.dataset.t;
+      document.getElementById('p-' + S.tab).classList.add('on');
+    });
+  });
+}
+
+async function fetchData() {
+  S.loading = true; renderStrip();
+  try {
+    const r = await fetch(S.url + '?action=all');
+    const text = await r.text();
+    if (text.trim().charAt(0) !== '{') {
+      S.err = 'Response is not JSON — check your Apps Script URL and deployment';
+    } else {
+      const d = JSON.parse(text);
+      if (d.status === 'ok') { S.data = d; S.err = null; }
+      else S.err = d.msg || 'Error';
+    }
+  } catch(e) { S.err = e.message; }
+  S.loading = false;
+  render();
+  clearTimeout(S.timer);
+  S.timer = setTimeout(fetchData, S.refreshMs);
+}
+
+// ============================================================
+// Regime (same logic as phone)
+// ============================================================
+function calcRegime() {
+  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], gates:[] };
+  const L = S.data.latest, D = S.data.daily || [];
+  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], gates:[] };
+
+  const cautionR = [], primeBlock = [];
+  if (L.acct && L.tm && L.acct.dd >= L.tm.ddSoft)
+    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% >= ' + L.tm.ddSoft + '%');
+
+  if (L.pairs) for (const p of L.pairs) {
+    const grid = Math.max(p.buyN||0, p.sellN||0);
+    const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
+    if (adxPct >= 0.8 && p.brk) cautionR.push(p.n + ' ADX ' + p.adx.toFixed(0));
+    if (grid >= 6) cautionR.push(p.n + ' grid ' + grid);
+    if (p.atrR >= 1.3) cautionR.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
+    if (p.fb) cautionR.push(p.n + ' float breaker');
+    if (adxPct >= 0.7) primeBlock.push(p.n + ' ADX');
+    if (p.atrR >= 1.1) primeBlock.push(p.n + ' ATR');
+    if (grid > 4) primeBlock.push(p.n + ' grid');
+  }
+
+  const streak = calcLossStreak(D);
+  if (streak >= 4) cautionR.push(streak + '-day loss streak');
+  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, gates:primeBlock };
+
+  const pnl7d = calc7dPnl(D);
+  if (pnl7d <= 0) primeBlock.push('7d P&L');
+  const rf = calcRF(D);
+  if (rf < 1.5 && rf >= 0) primeBlock.push('RF ' + rf.toFixed(1));
+  if (L.acct) {
+    const cushion = L.acct.eq - L.acct.floor;
+    const dd7d = calc7dMaxDD();
+    if (cushion > 0 && dd7d > cushion * 0.4) primeBlock.push('7d DD');
+  }
+  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], gates:[] };
+  return { r:'NORMAL', c:'var(--blu)', reasons:[], gates:primeBlock };
+}
+
+function calcLossStreak(D) {
+  if (!D || !D.length) return 0;
+  const bd = {}; for (const d of D) bd[d.date] = (bd[d.date]||0) + (d.pnl||0);
+  let s = 0; for (const dt of Object.keys(bd).sort().reverse()) { if (bd[dt] < 0) s++; else break; } return s;
+}
+function calc7dPnl(D) {
+  if (!D) return 0;
+  const c = new Date(); c.setDate(c.getDate()-7);
+  const cs = c.toISOString().substring(0,10).replace(/-/g,'.');
+  return D.filter(d=>d.date>=cs).reduce((s,d)=>s+(d.pnl||0),0);
+}
+function calcRF(D) {
+  if (!D||!D.length) return 0;
+  const bd = {}; for (const d of D) bd[d.date] = (bd[d.date]||0) + (d.pnl||0);
+  let cum=0,pk=0,mdd=0;
+  for (const dt of Object.keys(bd).sort()) { cum+=bd[dt]; if(cum>pk) pk=cum; const dd=pk-cum; if(dd>mdd) mdd=dd; }
+  return mdd<=0 ? (cum>0?99:0) : cum/mdd;
+}
+function calc7dMaxDD() {
+  if (!S.data||!S.data.snapshots) return 0;
+  let mx=0; for (const s of S.data.snapshots) if(s.dd>mx) mx=s.dd;
+  return (S.data.latest?S.data.latest.acct.bal:0)*mx/100;
+}
+function calcLots() {
+  if (!S.data||!S.data.latest) return null;
+  const L=S.data.latest, reg=calcRegime(), pairs=L.pairs?L.pairs.length:1;
+  const cushion=L.acct.eq-L.acct.floor, pp=pairs>0?cushion/pairs:cushion;
+  const hm=Math.max(0.01,Math.floor(pp/100)*0.01), tm2=Math.max(0.01,Math.floor(pp/150)*0.01);
+  let rec; switch(reg.r){ case'PRIME':rec=tm2;break; case'NORMAL':rec=Math.min(hm,L.acct.baseLots||0.01);break;
+    case'CAUTION':rec=L.acct.baseLots||0.01;break; default:rec=0.01; }
+  rec=Math.max(0.01,rec);
+  const pct=hm>0.01?Math.min(100,((rec-0.01)/(hm-0.01))*100):0;
+  return { rec,hardMax:hm,tierMax:tm2,cushion,perPair:pp,pct,regime:reg };
+}
+
+// ============================================================
+// Render
+// ============================================================
+function render() { renderStrip(); renderLive(); renderLots(); renderPairs(); renderMgr(); renderHist(); }
+
+function renderStrip() {
+  const el = document.getElementById('strip');
+  if (!S.data||!S.data.latest) {
+    el.innerHTML = `<span class="strip-title"><span class="a">TM</span> Dashboard</span>
+      <span class="dim">${S.loading?'Loading...':(S.err||'No data')}</span>
+      <span class="f1"></span><button class="btn-sm" onclick="disconnect()">Disconnect</button>`;
+    return;
+  }
+  const L=S.data.latest, a=L.acct, reg=calcRegime(), tm=L.tm||{};
+  el.innerHTML = `<span class="strip-title"><span class="a">TM</span> Dashboard <span class="strip-dot" style="background:${reg.c}"></span></span>
+    <div class="strip-metrics">
+      <span><span class="lbl">Bal</span><span class="val">$${a.bal.toFixed(0)}</span></span>
+      <span><span class="lbl">Eq</span><span class="val">$${a.eq.toFixed(0)}</span></span>
+      <span><span class="lbl">DD</span><span class="val ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</span></span>
+      <span><span class="lbl">Peak</span><span class="val">$${a.peak.toFixed(0)}</span></span>
+      <span><span class="lbl">Trades</span><span class="val">${L.totalOpen||0}/${tm.maxT||50}</span></span>
+      <span><span class="lbl">TM</span><span class="val" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'ON':'OFF'}</span></span>
+    </div>
+    <span class="pill" style="background:${reg.c}22;color:${reg.c};border:1px solid ${reg.c}44">${reg.r}</span>
+    <span class="dim" style="font-size:9px">${L.ts?L.ts.substring(11,16):''}</span>
+    <button class="btn-sm" onclick="fetchData()">Refresh</button>
+    <button class="btn-sm" onclick="disconnect()">×</button>`;
+}
+
+// ============================================================
+// LIVE
+// ============================================================
+function renderLive() {
+  const el=document.getElementById('p-live');
+  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">Waiting for data...</div>';return;}
+  const L=S.data.latest, a=L.acct, reg=calcRegime(), tm=L.tm||{};
+  let h='';
+
+  // Alerts
+  if(tm.kill) h+=`<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span style="color:var(--red);font-weight:700">KILL SWITCH ACTIVATED</span></div>`;
+  if(reg.reasons&&reg.reasons.length) h+=`<div class="alert" style="background:${reg.c}12;border:1px solid ${reg.c}33;color:${reg.c}">${reg.reasons.join(' · ')}</div>`;
+
+  h+='<div class="g2">';
+  // Left: Account + lot sizing
+  h+=`<div>
+    <div class="card"><div class="card-t">Account</div><div class="mg mg3">
+      <div class="m"><div class="m-l">Balance</div><div class="m-v">$${a.bal.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Equity</div><div class="m-v">$${a.eq.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Drawdown</div><div class="m-v ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</div></div>
+    </div><div class="mg mg3">
+      <div class="m"><div class="m-l">Peak</div><div class="m-v">$${a.peak.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Floor</div><div class="m-v">$${a.floor.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${(a.eq-a.floor).toFixed(0)}</div></div>
+    </div>${renderSparkline()}</div>`;
+
+  // TM status
+  h+=`<div class="card"><div class="card-t">Trade Manager</div><div class="mg mg2">
+      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'Online':'Offline'}</div></div>
+      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def?'DEFENSIVE':'Normal'}</div></div>
+    </div><div class="mg mg4">
+      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
+      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
+      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
+      <div class="m"><div class="m-l">Float</div><div class="m-v">${tm.dayF||0}</div></div>
+    </div></div>`;
+  h+='</div>';
+
+  // Pair comparison table
+  if(L.pairs&&L.pairs.length) {
+    h+=`<div class="card"><div class="card-t">Pair Overview</div><table><thead><tr><th></th>`;
+    for(const p of L.pairs) h+=`<th style="text-align:center">${p.n}</th>`;
+    h+='</tr></thead><tbody>';
+    const rows = [
+      {l:'ADX',fn:p=>{const pct=p.adxR>0?p.adx/p.adxR:0;const c=pct>=0.8?'neg':pct>=0.7?'warn':'pos';return`<span class="${c}">${p.adx.toFixed(0)}</span>/<span class="dim">${p.adxR}</span>`}},
+      {l:'Trend',fn:p=>{const t=(p.diP||0)>(p.diM||0)?'UP':'DN';return`<span style="color:${t==='UP'?'var(--grn)':'var(--red)'}">${t}</span>`}},
+      {l:'ATR',fn:p=>`<span class="${p.atrR>=1.3?'neg':p.atrR>=1.1?'warn':''}">${p.atrR.toFixed(2)}x</span>`},
+      {l:'Grid (B/S)',fn:p=>`${p.buyN||0} / ${p.sellN||0}`},
+      {l:'Lots (B/S)',fn:p=>`${(p.buyLot||0).toFixed(2)} / ${(p.sellLot||0).toFixed(2)}`},
+      {l:'Max Lot',fn:p=>`${Math.max(p.maxBuyLot||0,p.maxSellLot||0).toFixed(2)}`},
+      {l:'Float P&L',fn:p=>`<span class="${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</span>`},
+      {l:'Spread',fn:p=>`${(p.spd||0).toFixed(0)}`},
+      {l:'Breakout',fn:p=>p.brk?'<span class="warn">YES</span>':'<span class="dim">no</span>'},
+      {l:'Float Brk',fn:p=>p.fb?'<span class="neg">ACTIVE</span>':'<span class="dim">off</span>'},
+      {l:'Cooldown',fn:p=>(p.cdB||p.cdS)?`<span class="warn">${p.cdB?'B':''}${p.cdS?'S':''}</span>`:'<span class="dim">—</span>'},
+    ];
+    for(const r of rows) {
+      h+=`<tr><td class="dim">${r.l}</td>`;
+      for(const p of L.pairs) h+=`<td style="text-align:center">${r.fn(p)}</td>`;
+      h+='</tr>';
+    }
+    h+='</tbody></table></div>';
+  }
+
+  // Open trades (full table)
+  if(L.trades&&L.trades.length) {
+    const sorted=[...L.trades].sort((a,b)=>a.pl-b.pl);
+    h+=`<div class="card"><div class="card-t">Open Trades (${sorted.length})</div>
+      <table><thead><tr><th>Pair</th><th>Side</th><th>Lots</th><th>Open</th><th>Current</th><th>P&L</th><th>Duration</th><th>SL</th></tr></thead><tbody>`;
+    for(const t of sorted) {
+      h+=`<tr><td style="font-weight:700">${t.pr}</td>
+        <td class="${t.ty==='B'?'pos':'neg'}">${t.ty}</td>
+        <td>${t.lt}</td><td>${t.op}</td><td>${t.cp}</td>
+        <td class="${t.pl>=0?'pos':'neg'}" style="font-weight:600">$${t.pl.toFixed(2)}</td>
+        <td class="dim">${t.dur}m</td><td class="dim">${t.sl||'—'}</td></tr>`;
+    }
+    h+='</tbody></table></div>';
+  }
+
+  el.innerHTML=h;
+}
+
+// ============================================================
+// LOT SIZING
+// ============================================================
+function renderLots() {
+  const el=document.getElementById('p-lots');
+  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
+  const L=S.data.latest, lots=calcLots(), reg=lots?lots.regime:calcRegime(), D=S.data.daily||[];
+  let h='';
+
+  h+=`<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
+
+  h+='<div class="g2">';
+  // Left: recommendation
+  if(lots) {
+    h+=`<div class="card"><div class="card-t">Recommendation</div>
+      <div class="tac" style="padding:14px 0"><div style="font-size:32px;font-weight:700;color:${reg.c}">${lots.rec.toFixed(2)}</div>
+      <div class="dim mt4">lots per position</div></div>
+      <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${lots.pct}%;background:${reg.c}"></div></div>
+      <div class="fxb dim" style="font-size:9px;margin-top:4px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
+      <div class="mg mg2 mt8">
+        <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${lots.cushion.toFixed(0)}</div></div>
+        <div class="m"><div class="m-l">Per Pair</div><div class="m-v">$${lots.perPair.toFixed(0)}</div></div>
+        <div class="m"><div class="m-l">Hard Gate (÷$100)</div><div class="m-v">${lots.hardMax.toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">Tier Gate (÷$150)</div><div class="m-v">${lots.tierMax.toFixed(2)}</div></div>
+      </div></div>`;
+  }
+
+  // Right: all gates
+  const pnl7d=calc7dPnl(D), rfVal=calcRF(D), streak=calcLossStreak(D);
+  const gates=[
+    {name:'7d Net P&L',val:'$'+pnl7d.toFixed(2),pass:pnl7d>0,cat:'Track Record'},
+    {name:'Recovery Factor',val:rfVal>=99?'∞':rfVal.toFixed(1),pass:rfVal>=1.5,cat:'Track Record'},
+    {name:'Loss Streak',val:streak+' days',pass:streak<4,cat:'Track Record'},
+  ];
+  if(L.pairs) for(const p of L.pairs) {
+    const adxPct=p.adxR>0?(p.adx/p.adxR*100):0, grid=Math.max(p.buyN||0,p.sellN||0);
+    gates.push({name:p.n+' ADX',val:adxPct.toFixed(0)+'%',pass:adxPct<70,cat:'Market'});
+    gates.push({name:p.n+' ATR',val:p.atrR.toFixed(2)+'x',pass:p.atrR<1.1,cat:'Market'});
+    gates.push({name:p.n+' Grid',val:grid.toString(),pass:grid<=4,cat:'Market'});
+  }
+
+  h+=`<div class="card"><div class="card-t">All Gates</div>`;
+  for(const g of gates) {
+    const col=g.pass?'var(--grn)':'var(--red)';
+    h+=`<div class="row"><span class="row-l">${g.name}</span>
+      <span><span class="row-v" style="margin-right:8px">${g.val}</span>
+      <span class="pill" style="background:${col}22;color:${col}">${g.pass?'PASS':'FAIL'}</span></span></div>`;
+  }
+  h+=`<div class="dim mt4" style="font-size:8px">PRIME requires all gates to pass. Any gate failing caps at NORMAL.</div></div>`;
+  h+='</div>';
+
+  el.innerHTML=h;
+}
+
+// ============================================================
+// PAIRS
+// ============================================================
+function renderPairs() {
+  const el=document.getElementById('p-pairs');
+  if(!S.data||!S.data.latest||!S.data.latest.pairs){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
+  const L=S.data.latest, D=S.data.daily||[];
+  let h='';
+
+  // Side by side pair cards
+  h+=`<div class="g${Math.min(3,L.pairs.length)}">`;
+  for(const p of L.pairs) {
+    const pD=D.filter(d=>d.pair===p.n);
+    const tp=pD.reduce((s,d)=>s+(d.pnl||0),0);
+    const tw=pD.reduce((s,d)=>s+(d.wins||0),0);
+    const tl=pD.reduce((s,d)=>s+(d.losses||0),0);
+    const tc=tw+tl, wr=tc>0?(tw/tc*100):0;
+    const days=new Set(pD.map(d=>d.date)).size;
+    const dr=days>0?tp/days:0;
+    const tbp=pD.reduce((s,d)=>s+(d.blkPnl||0),0);
+    const tbc=pD.reduce((s,d)=>s+(d.blkClosed||0),0);
+    const gp=pD.reduce((s,d)=>s+(d.pnl>0?d.pnl:0),0);
+    const bcr=gp>0?(Math.abs(tbp)/gp*100):0;
+    const today=L.day||''; const td=pD.find(d=>d.date===today);
+    const adxPct=p.adxR>0?p.adx/p.adxR:0;
+    const adxCol=adxPct>=0.8?'var(--red)':adxPct>=0.7?'var(--amb)':'var(--grn)';
+    const grid=Math.max(p.buyN||0,p.sellN||0);
+    const trend=(p.diP||0)>(p.diM||0)?'UP':'DN';
+
+    h+=`<div class="pcard">
+      <div class="pcard-hdr"><span class="pcard-name">${p.n}</span>
+        <span class="pill" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span></div>
+      <div class="badge">
+        <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
+        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Grid ${grid}</span>
+        <span class="bdg" style="color:${trend==='UP'?'var(--grn)':'var(--red)'}">▸${trend}</span>
+        ${p.fb?'<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT</span>':''}
+      </div>
+      <div class="mg mg2 mt4">
+        <div class="m"><div class="m-l">Float</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">Today</div><div class="m-v ${(td?td.pnl:0)>=0?'pos':'neg'}">$${(td?td.pnl:0).toFixed(2)}</div></div>
+      </div>
+      <div class="mg mg2">
+        <div class="m"><div class="m-l">All Time</div><div class="m-v ${tp>=0?'pos':'neg'}">$${tp.toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">$/day</div><div class="m-v ${dr>=0?'pos':'neg'}">${dr.toFixed(2)}</div></div>
+      </div>
+      <div class="mg mg3">
+        <div class="m"><div class="m-l">Win%</div><div class="m-v">${wr.toFixed(0)}%</div></div>
+        <div class="m"><div class="m-l">Blk Cost</div><div class="m-v">${bcr.toFixed(0)}%</div></div>
+        <div class="m"><div class="m-l">Trades</div><div class="m-v">${tc}</div></div>
+      </div>
+      <div class="fxb dim mt4" style="font-size:9px"><span>${days}d active</span><span>Blk: ${tbc} ($${tbp.toFixed(2)})</span></div>
+    </div>`;
+  }
+  h+='</div>';
+
+  // Retired pairs
+  if(D.length>0&&L.pairs) {
+    const active=new Set(L.pairs.map(p=>p.n));
+    const all=new Set(D.map(d=>d.pair));
+    const retired=[...all].filter(p=>!active.has(p));
+    if(retired.length) {
+      h+=`<div class="card mt8"><div class="card-t">Retired Pairs</div>`;
+      for(const rp of retired) {
+        const rd=D.filter(d=>d.pair===rp); const rpnl=rd.reduce((s,d)=>s+(d.pnl||0),0);
+        const rdays=new Set(rd.map(d=>d.date)).size;
+        h+=`<div class="row"><span class="row-l">${rp} <span class="dim">(${rdays}d)</span></span>
+          <span class="row-v ${rpnl>=0?'pos':'neg'}">$${rpnl.toFixed(2)}</span></div>`;
+      }
+      h+='</div>';
+    }
+  }
+  el.innerHTML=h;
+}
+
+// ============================================================
+// MANAGER
+// ============================================================
+function renderMgr() {
+  const el=document.getElementById('p-mgr');
+  if(!S.data||!S.data.latest){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
+  const L=S.data.latest, tm=L.tm||{}, D=S.data.daily||[];
+  let h='';
+
+  h+='<div class="g2">';
+  // Left: TM config + status
+  h+=`<div><div class="card"><div class="card-t">TM Status</div><div class="mg mg2">
+      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active?'Online':'Offline'}</div></div>
+      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def?'DEFENSIVE':'Normal'}</div></div>
+    </div><div class="mg mg4">
+      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
+      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
+      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
+      <div class="m"><div class="m-l">Float</div><div class="m-v">${tm.dayF||0}</div></div>
+    </div></div>
+    <div class="card"><div class="card-t">TM Config</div>
+      <div class="row"><span class="row-l">DD Soft</span><span class="row-v">${tm.ddSoft||15}%</span></div>
+      <div class="row"><span class="row-l">Defensive DD</span><span class="row-v">${tm.defDD||10}%</span></div>
+      <div class="row"><span class="row-l">Max Trades</span><span class="row-v">${tm.maxT||50}</span></div>
+      <div class="row"><span class="row-l">Equity Floor</span><span class="row-v">$${L.acct.floor.toFixed(0)}</span></div>
+    </div></div>`;
+
+  // Right: strategy metrics
+  const pnl7d=calc7dPnl(D),rfVal=calcRF(D),streak=calcLossStreak(D);
+  const tp=D.reduce((s,d)=>s+(d.pnl||0),0),td2=new Set(D.map(d=>d.date)).size;
+  const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0);
+  let gw=0,gl=0; for(const dt of Object.keys(bd)){if(bd[dt]>0)gw+=bd[dt];else gl+=Math.abs(bd[dt]);}
+  const dpf=gl>0?gw/gl:(gw>0?99:0);
+
+  h+=`<div><div class="card"><div class="card-t">Strategy Metrics</div><div class="mg mg3">
+      <div class="m"><div class="m-l">Total P&L</div><div class="m-v ${tp>=0?'pos':'neg'}">$${tp.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">$/day avg</div><div class="m-v">${td2>0?(tp/td2).toFixed(2):'—'}</div></div>
+    </div><div class="mg mg3">
+      <div class="m"><div class="m-l">Daily PF*</div><div class="m-v">${dpf>=99?'∞':dpf.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">RF</div><div class="m-v">${rfVal>=99?'∞':rfVal.toFixed(1)}</div></div>
+      <div class="m"><div class="m-l">Loss Streak</div><div class="m-v ${streak>=4?'neg':''}">${streak}d</div></div>
+    </div>
+    <div class="dim" style="font-size:8px">*Daily PF uses daily net P&L, not trade-level gross win/loss</div>
+    </div>`;
+
+  // Block cost ratio
+  if(L.pairs&&D.length) {
+    h+=`<div class="card"><div class="card-t">Block Cost Ratio</div>`;
+    for(const p of L.pairs) {
+      const pd=D.filter(d=>d.pair===p.n);
+      const bp=pd.reduce((s,d)=>s+Math.abs(d.blkPnl||0),0);
+      const gp=pd.reduce((s,d)=>s+(d.pnl>0?d.pnl:0),0);
+      const r=gp>0?(bp/gp*100):0;
+      h+=`<div class="row"><span class="row-l">${p.n}</span>
+        <span class="row-v ${r>20?'neg':r>10?'warn':''}">${r.toFixed(1)}%</span></div>`;
+    }
+    h+=`<div class="dim mt4" style="font-size:8px">|blocked P&L| ÷ gross positive P&L</div></div>`;
+  }
+  h+='</div>';
+  h+='</div>';
+
+  // ADX status table
+  if(L.pairs) {
+    h+=`<div class="card"><div class="card-t">ADX Status</div><table><thead><tr>
+      <th>Pair</th><th>ADX</th><th>Red</th><th>%</th><th>Trend</th><th>DI+</th><th>DI-</th><th>BRK</th></tr></thead><tbody>`;
+    for(const p of L.pairs) {
+      const pct=p.adxR>0?(p.adx/p.adxR*100):0;
+      const t=(p.diP||0)>(p.diM||0)?'UP':'DN';
+      h+=`<tr><td style="font-weight:700">${p.n}</td>
+        <td class="${pct>=80?'neg':pct>=70?'warn':''}">${p.adx.toFixed(1)}</td>
+        <td class="dim">${p.adxR}</td>
+        <td class="${pct>=80?'neg':pct>=70?'warn':''}">${pct.toFixed(0)}%</td>
+        <td style="color:${t==='UP'?'var(--grn)':'var(--red)'}">${t}</td>
+        <td>${(p.diP||0).toFixed(1)}</td><td>${(p.diM||0).toFixed(1)}</td>
+        <td>${p.brk?'<span class="warn">YES</span>':'<span class="dim">—</span>'}</td></tr>`;
+    }
+    h+='</tbody></table></div>';
+  }
+
+  el.innerHTML=h;
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function renderHist() {
+  const el=document.getElementById('p-hist');
+  if(!S.data){el.innerHTML='<div class="tac dim" style="padding:40px">No data</div>';return;}
+  const D=S.data.daily||[], snaps=S.data.snapshots||[];
+  const tp=D.reduce((s,d)=>s+(d.pnl||0),0);
+  const bd={}; for(const d of D) bd[d.date]=(bd[d.date]||0)+(d.pnl||0);
+  const dates=Object.keys(bd).sort();
+  let h='';
+
+  // Running total + withdrawal tracking
+  const totalWd=S.withdrawals.reduce((s,w)=>s+(w.amount||0),0);
+  h+=`<div class="card"><div class="fxb">
+    <div><div class="card-t" style="margin:0">Running Total</div></div>
+    <div class="fx gap12" style="align-items:baseline">
+      <div class="m-v ${tp>=0?'pos':'neg'}" style="font-size:22px">$${tp.toFixed(2)}</div>
+      <button class="btn-sm" onclick="showWdModal()">+ Withdrawal</button>
+    </div></div>
+    ${totalWd>0?`<div class="dim mt4">Withdrawn: $${totalWd.toFixed(2)} | Net: $${(tp-totalWd).toFixed(2)}</div>`:''}
+  </div>`;
+
+  // Charts side by side
+  h+='<div class="g2">';
+  if(snaps.length>2) {
+    h+=`<div class="card"><div class="card-t">Equity (${snaps.length} snapshots)</div>
+      <div class="chart-wrap">${renderEquityChart(snaps,500,150)}</div></div>`;
+  }
+  if(dates.length>0) {
+    h+=`<div class="card"><div class="card-t">Daily P&L</div>
+      <div class="chart-wrap">${renderDailyBars(dates,bd,500,130)}</div></div>`;
+  }
+  h+='</div>';
+
+  // Trade history table with pair filter
+  if(D.length>0) {
+    const pairsInData=[...new Set(D.map(d=>d.pair))].sort();
+    h+=`<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Daily History</div>
+      <div class="filters"><select id="histPairFilter" onchange="S.pairFilter=this.value;renderHist()">
+        <option value="all">All Pairs</option>${pairsInData.map(p=>`<option value="${p}" ${S.pairFilter===p?'selected':''}>${p}</option>`).join('')}
+      </select></div></div>
+      <table><thead><tr><th>Date</th><th>Pair</th><th>P&L</th><th>W</th><th>L</th><th>Win%</th><th>Avg Dur</th><th>Blk</th><th>Blk P&L</th></tr></thead><tbody>`;
+
+    const filtered=S.pairFilter==='all'?D:D.filter(d=>d.pair===S.pairFilter);
+    const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date)||a.pair.localeCompare(b.pair));
+    for(const d of sorted.slice(0,100)) {
+      const tc=(d.wins||0)+(d.losses||0);
+      const wr=tc>0?((d.wins||0)/tc*100):0;
+      h+=`<tr><td class="dim">${d.date}</td><td style="font-weight:600">${d.pair}</td>
+        <td class="${(d.pnl||0)>=0?'pos':'neg'}" style="font-weight:600">$${(d.pnl||0).toFixed(2)}</td>
+        <td class="pos">${d.wins||0}</td><td class="neg">${d.losses||0}</td>
+        <td>${wr.toFixed(0)}%</td><td class="dim">${(d.avgDur||0).toFixed(0)}m</td>
+        <td>${d.blkClosed||0}</td>
+        <td class="${(d.blkPnl||0)<0?'neg':''}">${(d.blkPnl||0)!==0?'$'+(d.blkPnl||0).toFixed(2):'—'}</td></tr>`;
+    }
+    h+='</tbody></table></div>';
+  }
+
+  // Withdrawal log
+  if(S.withdrawals.length) {
+    h+=`<div class="card"><div class="card-t">Withdrawals</div>`;
+    for(const w of [...S.withdrawals].reverse()) {
+      h+=`<div class="row"><span class="row-l">${w.date}</span><span class="row-v">$${w.amount.toFixed(2)}</span></div>`;
+    }
+    h+='</div>';
+  }
+
+  el.innerHTML=h;
+}
+
+// ============================================================
+// Charts
+// ============================================================
+function renderSparkline() {
+  if(!S.data||!S.data.snapshots||S.data.snapshots.length<3) return '';
+  const snaps=S.data.snapshots.slice(-60);
+  const eqs=snaps.map(s=>s.eq), mn=Math.min(...eqs)*0.999, mx=Math.max(...eqs)*1.001;
+  const w=400,h2=35;
+  const pts=eqs.map((v,i)=>{const x=i/(eqs.length-1)*w;const y=h2-(v-mn)/(mx-mn)*h2;return`${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h2}" style="width:100%;height:35px;margin-top:6px"><polyline points="${pts}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+function renderEquityChart(snaps,W=500,H=150) {
+  const P=30;
+  const bals=snaps.map(s=>s.bal), eqs=snaps.map(s=>s.eq);
+  const all=[...bals,...eqs], mn=Math.min(...all)*0.998, mx=Math.max(...all)*1.002, rng=mx-mn||1;
+  function pts(arr){return arr.map((v,i)=>{const x=P+(i/(arr.length-1))*(W-P*2);const y=10+(1-(v-mn)/rng)*(H-20);return`${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');}
+  let labs='';
+  for(let i=0;i<=4;i++){const v=mn+(rng*i/4);const y=10+(1-i/4)*(H-20);
+    labs+=`<text x="${P-4}" y="${y+3}" fill="var(--mt)" font-size="8" text-anchor="end">$${v.toFixed(0)}</text>`;
+    labs+=`<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="var(--bd)" stroke-width="0.5"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">${labs}
+    <polyline points="${pts(bals)}" fill="none" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3,2"/>
+    <polyline points="${pts(eqs)}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg><div class="fxb dim" style="font-size:8px"><span>— Balance</span><span style="color:var(--blu)">— Equity</span></div>`;
+}
+
+function renderDailyBars(dates,bd,W=500,H=130) {
+  const P=30, vals=dates.map(d=>bd[d]), mxA=Math.max(1,...vals.map(Math.abs));
+  const bw=Math.max(2,Math.min(14,(W-P*2)/dates.length-1)), mid=H/2;
+  let bars='';
+  for(let i=0;i<dates.length;i++){const v=vals[i];const x=P+(i/dates.length)*(W-P*2);
+    const bh=Math.abs(v)/mxA*(H/2-5);const y=v>=0?mid-bh:mid;const c=v>=0?'var(--grn)':'var(--red)';
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${Math.max(1,bh).toFixed(1)}" fill="${c}" rx="1"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
+    <line x1="${P}" y1="${mid}" x2="${W-P}" y2="${mid}" stroke="var(--mt)" stroke-width="0.5"/>
+    <text x="${P-4}" y="${mid+3}" fill="var(--mt)" font-size="8" text-anchor="end">$0</text>
+    <text x="${P-4}" y="12" fill="var(--mt)" font-size="8" text-anchor="end">+$${mxA.toFixed(0)}</text>
+    <text x="${P-4}" y="${H-2}" fill="var(--mt)" font-size="8" text-anchor="end">-$${mxA.toFixed(0)}</text>
+    ${bars}</svg>`;
+}
+
+// ============================================================
+// Withdrawal modal
+// ============================================================
+function showWdModal() {
+  const today=new Date().toISOString().substring(0,10);
+  document.getElementById('modal').innerHTML = `<div class="modal-bg" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>Record Withdrawal</h3>
+      <input type="number" id="wdAmt" placeholder="Amount ($)" step="0.01">
+      <input type="date" id="wdDate" value="${today}">
+      <div style="margin-top:8px"><button onclick="saveWd()">Save</button><button class="btn-cancel" onclick="closeModal()">Cancel</button></div>
+    </div></div>`;
+}
+
+function saveWd() {
+  const amt=parseFloat(document.getElementById('wdAmt').value);
+  const date=document.getElementById('wdDate').value;
+  if(!amt||amt<=0) return;
+  S.withdrawals.push({amount:amt,date:date});
+  localStorage.setItem('tm_wd',JSON.stringify(S.withdrawals));
+  closeModal();
+  renderHist();
+}
+
+function closeModal(e) {
+  if(e&&e.target!==e.currentTarget) return;
+  document.getElementById('modal').innerHTML='';
+}
+
+function disconnect() {
+  localStorage.removeItem('tm_url');
+  S.url=''; S.data=null;
+  clearTimeout(S.timer);
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('connectScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

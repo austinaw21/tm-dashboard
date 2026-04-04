@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TM Dashboard</title>
+<style>
+:root{
+  --bg:#0a0e17;--sf:#111827;--sf2:#1a2235;--bd:#1e293b;
+  --tx:#e2e8f0;--dim:#94a3b8;--mt:#64748b;
+  --grn:#22c55e;--grn2:rgba(34,197,94,.12);--grnB:rgba(34,197,94,.3);
+  --amb:#f59e0b;--amb2:rgba(245,158,11,.12);--ambB:rgba(245,158,11,.3);
+  --red:#ef4444;--red2:rgba(239,68,68,.12);--redB:rgba(239,68,68,.3);
+  --blu:#3b82f6;--blu2:rgba(59,130,246,.1);--bluB:rgba(59,130,246,.3);
+  --r:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'SF Mono','Fira Code','JetBrains Mono','Courier New',monospace;
+  max-width:480px;margin:0 auto;min-height:100vh;font-size:12px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:0;height:0}
+
+/* Header */
+.hdr{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--bd);padding:10px 14px 6px}
+.hdr-top{display:flex;justify-content:space-between;align-items:center}
+.hdr-title{font-size:13px;font-weight:700;letter-spacing:.5px}
+.hdr-title .a{color:var(--blu)}
+.hdr-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px}
+.hdr-sub{font-size:10px;color:var(--mt);margin-top:2px}
+.hdr-strip{display:flex;gap:10px;margin-top:6px;font-size:11px}
+.hdr-strip .v{font-weight:600}
+
+/* Tabs */
+.tabs{position:sticky;top:52px;z-index:15;background:var(--bg);display:flex;border-bottom:1px solid var(--bd)}
+.tab{flex:1;padding:8px 0;text-align:center;font-size:10px;font-weight:600;letter-spacing:.5px;
+  color:var(--mt);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.on{color:var(--blu);border-bottom-color:var(--blu)}
+
+/* Content */
+.pane{display:none;padding:10px 12px 80px}
+.pane.on{display:block}
+
+/* Cards */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.card-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mt);margin-bottom:8px}
+
+/* Metrics */
+.mg{display:grid;gap:6px;margin-bottom:8px}
+.mg3{grid-template-columns:repeat(3,1fr)}
+.mg2{grid-template-columns:repeat(2,1fr)}
+.mg4{grid-template-columns:repeat(4,1fr)}
+.m{background:var(--sf2);border-radius:6px;padding:6px 8px}
+.m-l{font-size:9px;color:var(--dim);margin-bottom:1px}
+.m-v{font-size:15px;font-weight:600}
+
+/* Regime banner */
+.regime{border-radius:var(--r);padding:10px 12px;margin-bottom:10px;text-align:center;font-weight:700;font-size:13px;letter-spacing:1px}
+
+/* Pill */
+.pill{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px}
+
+/* Progress bar */
+.pbar{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;margin:4px 0}
+.pbar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* Row */
+.row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.row+.row{border-top:1px solid var(--bd)}
+.row-l{font-size:10px;color:var(--dim)}
+.row-v{font-size:11px;font-weight:600}
+
+/* Trade rows */
+.tr-row{padding:6px 0;border-bottom:1px solid var(--bd);font-size:11px}
+.tr-row:last-child{border:none}
+.tr-top{display:flex;justify-content:space-between;align-items:center}
+.tr-bot{display:flex;gap:8px;font-size:9px;color:var(--dim);margin-top:2px}
+
+/* Pair cards */
+.pcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:10px;margin-bottom:8px}
+.pcard-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.pcard-name{font-size:12px;font-weight:700}
+
+/* Badge */
+.badge{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
+.bdg{font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;letter-spacing:.3px}
+
+/* Chart */
+.chart-wrap{background:var(--sf2);border-radius:6px;padding:8px;margin:6px 0}
+svg text{font-family:inherit}
+
+/* Collapsible */
+.coll-btn{width:100%;background:none;border:none;color:var(--dim);font:inherit;font-size:10px;
+  padding:6px 0;cursor:pointer;text-align:center}
+.coll-body{display:none}
+.coll-body.open{display:block}
+
+/* Connect screen */
+.connect{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:80vh;padding:30px;text-align:center}
+.connect h2{font-size:16px;margin-bottom:6px}
+.connect p{font-size:11px;color:var(--dim);margin-bottom:20px}
+.connect input{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:6px;
+  color:var(--tx);font:inherit;font-size:12px;padding:10px;margin-bottom:10px}
+.connect input:focus{outline:none;border-color:var(--blu)}
+.connect button{background:var(--blu);color:#fff;border:none;border-radius:6px;
+  font:inherit;font-weight:700;font-size:12px;padding:10px 24px;cursor:pointer}
+
+/* Alerts */
+.alert{border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:11px;display:flex;gap:6px;align-items:center}
+
+/* Utility */
+.neg{color:var(--red)}.pos{color:var(--grn)}.warn{color:var(--amb)}
+.dim{color:var(--dim)}.mt4{margin-top:4px}.mb4{margin-bottom:4px}
+.tac{text-align:center}.tar{text-align:right}
+.fx{display:flex}.fxb{display:flex;justify-content:space-between;align-items:center}
+.gap4{gap:4px}.gap8{gap:8px}
+.f1{flex:1}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Connect screen (shown when no URL) -->
+  <div class="connect" id="connectScreen">
+    <h2>TM Dashboard</h2>
+    <p>Paste your Google Apps Script URL to connect</p>
+    <input id="urlInput" placeholder="https://script.google.com/macros/s/.../exec" spellcheck="false">
+    <button onclick="saveUrl()">Connect</button>
+  </div>
+
+  <!-- Main dashboard (hidden until connected) -->
+  <div id="dashboard" class="hidden">
+    <div class="hdr" id="hdr"></div>
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-t="live">LIVE</div>
+      <div class="tab" data-t="lots">LOTS</div>
+      <div class="tab" data-t="pairs">PAIRS</div>
+      <div class="tab" data-t="mgr">MGR</div>
+      <div class="tab" data-t="hist">HIST</div>
+    </div>
+    <div class="pane on" id="p-live"></div>
+    <div class="pane" id="p-lots"></div>
+    <div class="pane" id="p-pairs"></div>
+    <div class="pane" id="p-mgr"></div>
+    <div class="pane" id="p-hist"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+const S = {
+  url: localStorage.getItem('tm_url') || '',
+  data: null,   // { latest, snapshots, daily }
+  err: null,
+  loading: false,
+  tab: 'live',
+  refreshMs: 180000,
+  timer: null,
+  settings: JSON.parse(localStorage.getItem('tm_settings') || '{}'),
+  withdrawals: JSON.parse(localStorage.getItem('tm_wd') || '[]'),
+};
+
+// ============================================================
+// Boot
+// ============================================================
+if (S.url) { showDashboard(); fetchData(); }
+else document.getElementById('connectScreen').classList.remove('hidden');
+
+function saveUrl() {
+  const v = document.getElementById('urlInput').value.trim();
+  if (v.length < 10) return;
+  S.url = v;
+  localStorage.setItem('tm_url', v);
+  showDashboard();
+  fetchData();
+}
+
+function showDashboard() {
+  document.getElementById('connectScreen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  setupTabs();
+}
+
+// ============================================================
+// Tabs
+// ============================================================
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      S.tab = t.dataset.t;
+      document.getElementById('p-' + S.tab).classList.add('on');
+    });
+  });
+}
+
+// ============================================================
+// Data fetching
+// ============================================================
+async function fetchData() {
+  S.loading = true;
+  renderHeader();
+  try {
+    const r = await fetch(S.url + '?action=all');
+    const text = await r.text();
+    if (text.trim().charAt(0) !== '{') {
+      S.err = 'Response is not JSON — check your Apps Script URL and deployment';
+    } else {
+      const d = JSON.parse(text);
+      if (d.status === 'ok') { S.data = d; S.err = null; }
+      else S.err = d.msg || 'Unknown error';
+    }
+  } catch(e) { S.err = e.message; }
+  S.loading = false;
+  render();
+  clearTimeout(S.timer);
+  S.timer = setTimeout(fetchData, S.refreshMs);
+}
+
+// ============================================================
+// Regime calculation
+// ============================================================
+function calcRegime() {
+  if (!S.data || !S.data.latest) return { r:'OFFLINE', c:'var(--mt)', reasons:[], gates:[] };
+  const L = S.data.latest;
+  const D = S.data.daily || [];
+
+  // DEFENSIVE from TM
+  if (L.tm && L.tm.def) return { r:'DEFENSIVE', c:'var(--red)', reasons:['TM defensive mode active'], gates:[] };
+
+  const cautionR = [];
+  const primeBlock = [];
+
+  // DD check
+  if (L.acct && L.tm && L.acct.dd >= L.tm.ddSoft)
+    cautionR.push('DD ' + L.acct.dd.toFixed(1) + '% >= ' + L.tm.ddSoft + '%');
+
+  // Per-pair checks
+  if (L.pairs) {
+    for (const p of L.pairs) {
+      const grid = Math.max(p.buyN || 0, p.sellN || 0);
+      const adxPct = p.adxR > 0 ? (p.adx / p.adxR) : 0;
+
+      // CAUTION triggers
+      if (adxPct >= 0.8 && p.brk) cautionR.push(p.n + ' ADX ' + p.adx.toFixed(0) + ' (' + (adxPct*100).toFixed(0) + '%)');
+      if (grid >= 6) cautionR.push(p.n + ' grid ' + grid);
+      if (p.atrR >= 1.3) cautionR.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
+      if (p.fb) cautionR.push(p.n + ' float breaker');
+
+      // PRIME blockers
+      if (adxPct >= 0.7) primeBlock.push(p.n + ' ADX ' + (adxPct*100).toFixed(0) + '%');
+      if (p.atrR >= 1.1) primeBlock.push(p.n + ' ATR ' + p.atrR.toFixed(1) + 'x');
+      if (grid > 4) primeBlock.push(p.n + ' grid ' + grid);
+    }
+  }
+
+  // Loss streak
+  const streak = calcLossStreak(D);
+  if (streak >= 4) cautionR.push(streak + '-day loss streak');
+
+  if (cautionR.length > 0) return { r:'CAUTION', c:'var(--amb)', reasons:cautionR, gates:primeBlock };
+
+  // PRIME checks
+  const pnl7d = calc7dPnl(D);
+  if (pnl7d <= 0) primeBlock.push('7d P&L $' + pnl7d.toFixed(2));
+  const rf = calcRF(D);
+  if (rf < 1.5 && rf >= 0) primeBlock.push('RF ' + rf.toFixed(1));
+  // 7d max DD vs cushion
+  if (L.acct) {
+    const cushion = L.acct.eq - L.acct.floor;
+    const dd7d = calc7dMaxDD();
+    if (cushion > 0 && dd7d > cushion * 0.4) primeBlock.push('7d DD > 40% cushion');
+  }
+
+  if (primeBlock.length === 0) return { r:'PRIME', c:'var(--grn)', reasons:[], gates:[] };
+  return { r:'NORMAL', c:'var(--blu)', reasons:[], gates:primeBlock };
+}
+
+function calcLossStreak(daily) {
+  if (!daily || daily.length === 0) return 0;
+  // Group by date, sum P&L
+  const byDate = {};
+  for (const d of daily) {
+    if (!byDate[d.date]) byDate[d.date] = 0;
+    byDate[d.date] += d.pnl || 0;
+  }
+  const dates = Object.keys(byDate).sort().reverse();
+  let streak = 0;
+  for (const dt of dates) {
+    if (byDate[dt] < 0) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function calc7dPnl(daily) {
+  if (!daily) return 0;
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+  const cutStr = cutoff.toISOString().substring(0,10).replace(/-/g,'.');
+  let sum = 0;
+  for (const d of daily) {
+    if (d.date >= cutStr) sum += d.pnl || 0;
+  }
+  return sum;
+}
+
+function calcRF(daily) {
+  if (!daily || daily.length === 0) return 0;
+  // RF = cumulative P&L / max drawdown from daily P&L curve
+  const byDate = {};
+  for (const d of daily) {
+    if (!byDate[d.date]) byDate[d.date] = 0;
+    byDate[d.date] += d.pnl || 0;
+  }
+  const dates = Object.keys(byDate).sort();
+  let cum = 0, peak = 0, maxDD = 0;
+  for (const dt of dates) {
+    cum += byDate[dt];
+    if (cum > peak) peak = cum;
+    const dd = peak - cum;
+    if (dd > maxDD) maxDD = dd;
+  }
+  if (maxDD <= 0) return cum > 0 ? 99 : 0;
+  return cum / maxDD;
+}
+
+function calc7dMaxDD() {
+  if (!S.data || !S.data.snapshots) return 0;
+  const snaps = S.data.snapshots;
+  if (snaps.length === 0) return 0;
+  let maxDD = 0;
+  for (const s of snaps) {
+    if (s.dd > maxDD) maxDD = s.dd;
+  }
+  // Convert from % to $
+  const bal = S.data.latest ? S.data.latest.acct.bal : 0;
+  return bal * maxDD / 100;
+}
+
+// ============================================================
+// Lot recommendation
+// ============================================================
+function calcLots() {
+  if (!S.data || !S.data.latest) return null;
+  const L = S.data.latest;
+  const reg = calcRegime();
+  const pairs = L.pairs ? L.pairs.length : 1;
+  const cushion = L.acct.eq - L.acct.floor;
+  const perPair = pairs > 0 ? cushion / pairs : cushion;
+
+  const hardMax = Math.max(0.01, Math.floor(perPair / 100) * 0.01);
+  const tierMax = Math.max(0.01, Math.floor(perPair / 150) * 0.01);
+
+  let rec;
+  switch(reg.r) {
+    case 'PRIME': rec = tierMax; break;
+    case 'NORMAL': rec = Math.min(hardMax, L.acct.baseLots || 0.01); break;
+    case 'CAUTION': rec = L.acct.baseLots || 0.01; break;
+    case 'DEFENSIVE': rec = 0.01; break;
+    default: rec = L.acct.baseLots || 0.01;
+  }
+  rec = Math.max(0.01, rec);
+
+  const pct = hardMax > 0.01 ? Math.min(100, ((rec - 0.01) / (hardMax - 0.01)) * 100) : 0;
+  return { rec, hardMax, tierMax, cushion, perPair, pct, regime: reg };
+}
+
+// ============================================================
+// Render
+// ============================================================
+function render() {
+  renderHeader();
+  renderLive();
+  renderLots();
+  renderPairs();
+  renderMgr();
+  renderHist();
+}
+
+// ============================================================
+// Header
+// ============================================================
+function renderHeader() {
+  const el = document.getElementById('hdr');
+  if (!S.data || !S.data.latest) {
+    el.innerHTML = `<div class="hdr-top"><span class="hdr-title"><span class="a">TM</span> Dashboard</span>
+      <span class="dim" style="font-size:10px">${S.loading ? 'Loading...' : (S.err || 'No data')}</span></div>`;
+    return;
+  }
+  const L = S.data.latest;
+  const a = L.acct;
+  const reg = calcRegime();
+  el.innerHTML = `<div class="hdr-top">
+    <span class="hdr-title"><span class="a">TM</span> Dashboard <span class="hdr-dot" style="background:${reg.c}"></span></span>
+    <span class="dim" style="font-size:9px">${L.ts ? L.ts.substring(11,16) : ''} GMT</span>
+  </div>
+  <div class="hdr-strip">
+    <span>B <span class="v">$${a.bal.toFixed(0)}</span></span>
+    <span>E <span class="v">$${a.eq.toFixed(0)}</span></span>
+    <span>DD <span class="v ${a.dd > 10 ? 'neg' : a.dd > 5 ? 'warn' : ''}">${a.dd.toFixed(1)}%</span></span>
+    <span class="pill" style="background:${reg.c}22;color:${reg.c};border:1px solid ${reg.c}44">${reg.r}</span>
+  </div>`;
+}
+
+// ============================================================
+// LIVE tab
+// ============================================================
+function renderLive() {
+  const el = document.getElementById('p-live');
+  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">Waiting for data...</div>'; return; }
+  const L = S.data.latest;
+  const a = L.acct;
+  const reg = calcRegime();
+  const tm = L.tm || {};
+  let h = '';
+
+  // Regime banner
+  h += `<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
+
+  // Alerts
+  if (tm.kill) h += `<div class="alert" style="background:var(--red2);border:1px solid var(--redB)"><span style="color:var(--red)">KILL SWITCH ACTIVATED</span></div>`;
+  if (reg.reasons && reg.reasons.length > 0) {
+    h += `<div class="alert" style="background:${reg.c}12;border:1px solid ${reg.c}33;color:${reg.c}">`;
+    h += reg.reasons.map(r => '• ' + r).join('<br>') + '</div>';
+  }
+  if (!tm.active) h += `<div class="alert" style="background:var(--amb2);border:1px solid var(--ambB);color:var(--amb)">Trade Manager offline</div>`;
+
+  // Account card
+  h += `<div class="card"><div class="card-t">Account</div><div class="mg mg3">
+    <div class="m"><div class="m-l">Balance</div><div class="m-v">$${a.bal.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Equity</div><div class="m-v">$${a.eq.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Drawdown</div><div class="m-v ${a.dd>10?'neg':a.dd>5?'warn':''}">${a.dd.toFixed(1)}%</div></div>
+  </div><div class="mg mg3">
+    <div class="m"><div class="m-l">Peak</div><div class="m-v">$${a.peak.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Floor</div><div class="m-v">$${a.floor.toFixed(0)}</div></div>
+    <div class="m"><div class="m-l">Cushion</div><div class="m-v pos">$${(a.eq - a.floor).toFixed(0)}</div></div>
+  </div>`;
+  // Equity sparkline
+  h += renderSparkline();
+  h += '</div>';
+
+  // Lot suggestion (compact)
+  const lots = calcLots();
+  if (lots) {
+    h += `<div class="card"><div class="card-t">Lot Sizing</div>
+      <div class="fxb"><span>Recommended</span><span class="m-v" style="font-size:18px">${lots.rec.toFixed(2)}</span></div>
+      <div class="pbar"><div class="pbar-fill" style="width:${lots.pct}%;background:${lots.regime.c}"></div></div>
+      <div class="fxb dim" style="font-size:9px"><span>Base 0.01</span><span>Max ${lots.hardMax.toFixed(2)}</span></div>
+    </div>`;
+  }
+
+  // Per-pair status rows
+  if (L.pairs) {
+    h += `<div class="card"><div class="card-t">Pairs Status</div>`;
+    for (const p of L.pairs) {
+      const grid = Math.max(p.buyN||0, p.sellN||0);
+      const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
+      const adxCol = adxPct >= 0.8 ? 'var(--red)' : adxPct >= 0.7 ? 'var(--amb)' : 'var(--grn)';
+      h += `<div class="row"><div>
+        <div style="font-weight:700;font-size:11px">${p.n}</div>
+        <div class="badge">
+          <span class="bdg" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
+          <span class="bdg" style="background:var(--sf2);color:var(--dim)">G:${grid}</span>
+          ${p.fb ? '<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT</span>' : ''}
+          ${p.cdB||p.cdS ? '<span class="bdg" style="background:var(--amb2);color:var(--amb)">CD</span>' : ''}
+        </div></div>
+        <div class="tar"><div class="${(p.floatPnl||0)>=0?'pos':'neg'}" style="font-weight:600">$${(p.floatPnl||0).toFixed(2)}</div>
+        <div class="dim" style="font-size:9px">${p.buyN||0}B / ${p.sellN||0}S</div></div>
+      </div>`;
+    }
+    h += '</div>';
+  }
+
+  // Trade count bar
+  const total = L.totalOpen || 0;
+  const maxT = tm.maxT || 50;
+  h += `<div class="card"><div class="card-t">Trades</div>
+    <div class="fxb"><span>${total} / ${maxT} open</span>
+    <span class="dim">A:${tm.dayA||0} B:${tm.dayB||0} C:${tm.dayC||0}</span></div>
+    <div class="pbar"><div class="pbar-fill" style="width:${(total/maxT*100).toFixed(0)}%;background:${total/maxT>0.8?'var(--red)':total/maxT>0.5?'var(--amb)':'var(--grn)'}"></div></div>
+  </div>`;
+
+  // Open trades (collapsible)
+  if (L.trades && L.trades.length > 0) {
+    const sorted = [...L.trades].sort((a,b) => a.pl - b.pl);
+    h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Open Trades (${sorted.length})</div>
+      <button class="coll-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Hide':'Show'">Show</button></div>
+      <div class="coll-body">`;
+    for (const t of sorted) {
+      h += `<div class="tr-row"><div class="tr-top">
+        <span><span style="font-weight:700">${t.pr}</span> <span class="${t.ty==='B'?'pos':'neg'}">${t.ty}</span> ${t.lt}</span>
+        <span class="${t.pl>=0?'pos':'neg'}" style="font-weight:600">$${t.pl.toFixed(2)}</span>
+      </div><div class="tr-bot">
+        <span>@${t.op}</span><span>${t.dur}min</span>${t.sl>0?'<span>SL:'+t.sl+'</span>':''}
+      </div></div>`;
+    }
+    h += '</div></div>';
+  }
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// LOTS tab
+// ============================================================
+function renderLots() {
+  const el = document.getElementById('p-lots');
+  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest;
+  const lots = calcLots();
+  const reg = lots ? lots.regime : calcRegime();
+  let h = '';
+
+  h += `<div class="regime" style="background:${reg.c}18;color:${reg.c};border:1px solid ${reg.c}33">${reg.r}</div>`;
+
+  if (lots) {
+    // Main recommendation
+    h += `<div class="card"><div class="card-t">Lot Recommendation</div>
+      <div class="tac" style="padding:10px 0"><div style="font-size:28px;font-weight:700;color:${reg.c}">${lots.rec.toFixed(2)}</div>
+      <div class="dim" style="font-size:10px;margin-top:4px">lots per position</div></div>
+      <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${lots.pct}%;background:${reg.c}"></div></div>
+      <div class="fxb dim" style="font-size:9px;margin-top:2px"><span>0.01 base</span><span>${lots.hardMax.toFixed(2)} max</span></div>
+    </div>`;
+
+    // Cushion math
+    h += `<div class="card"><div class="card-t">Cushion Breakdown</div><div class="mg mg2">
+      <div class="m"><div class="m-l">Total Cushion</div><div class="m-v pos">$${lots.cushion.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Per Pair</div><div class="m-v">$${lots.perPair.toFixed(0)}</div></div>
+      <div class="m"><div class="m-l">Hard Gate (÷$100)</div><div class="m-v">${lots.hardMax.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">Tier Gate (÷$150)</div><div class="m-v">${lots.tierMax.toFixed(2)}</div></div>
+    </div></div>`;
+  }
+
+  // Regime gates summary
+  h += `<div class="card"><div class="card-t">Gate Status</div>`;
+  const D = S.data.daily || [];
+  const pnl7d = calc7dPnl(D);
+  const rfVal = calcRF(D);
+  const streak = calcLossStreak(D);
+
+  const gates = [
+    { name: '7d Net P&L', val: '$' + pnl7d.toFixed(2), pass: pnl7d > 0 },
+    { name: 'Recovery Factor', val: rfVal >= 99 ? '∞' : rfVal.toFixed(1), pass: rfVal >= 1.5 },
+    { name: 'Loss Streak', val: streak + ' days', pass: streak < 4 },
+  ];
+
+  if (L.pairs) {
+    for (const p of L.pairs) {
+      const adxPct = p.adxR > 0 ? (p.adx / p.adxR * 100) : 0;
+      const grid = Math.max(p.buyN||0, p.sellN||0);
+      gates.push({ name: p.n + ' ADX', val: adxPct.toFixed(0) + '%', pass: adxPct < 70 });
+      gates.push({ name: p.n + ' ATR', val: p.atrR.toFixed(2) + 'x', pass: p.atrR < 1.1 });
+      gates.push({ name: p.n + ' Grid', val: grid.toString(), pass: grid <= 4 });
+    }
+  }
+
+  for (const g of gates) {
+    const col = g.pass ? 'var(--grn)' : 'var(--red)';
+    h += `<div class="row"><span class="row-l">${g.name}</span>
+      <span><span class="row-v" style="margin-right:6px">${g.val}</span>
+      <span class="pill" style="background:${col}22;color:${col}">${g.pass ? 'PASS' : 'FAIL'}</span></span></div>`;
+  }
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// PAIRS tab
+// ============================================================
+function renderPairs() {
+  const el = document.getElementById('p-pairs');
+  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest;
+  const D = S.data.daily || [];
+  let h = '';
+
+  if (!L.pairs) { el.innerHTML = '<div class="tac dim" style="padding:40px">No pair data</div>'; return; }
+
+  for (const p of L.pairs) {
+    // Collect daily history for this pair
+    const pDaily = D.filter(d => d.pair === p.n);
+    const totalPnl = pDaily.reduce((s,d) => s + (d.pnl||0), 0);
+    const totalWins = pDaily.reduce((s,d) => s + (d.wins||0), 0);
+    const totalLosses = pDaily.reduce((s,d) => s + (d.losses||0), 0);
+    const totalClosed = totalWins + totalLosses;
+    const winRate = totalClosed > 0 ? (totalWins / totalClosed * 100) : 0;
+    const daysActive = new Set(pDaily.map(d => d.date)).size;
+    const dailyRate = daysActive > 0 ? totalPnl / daysActive : 0;
+    const totalBlkPnl = pDaily.reduce((s,d) => s + (d.blkPnl||0), 0);
+    const totalBlkClosed = pDaily.reduce((s,d) => s + (d.blkClosed||0), 0);
+    const grossPos = pDaily.reduce((s,d) => s + (d.pnl > 0 ? d.pnl : 0), 0);
+    const blockCostRatio = grossPos > 0 ? (Math.abs(totalBlkPnl) / grossPos * 100) : 0;
+
+    // Today's stats
+    const today = L.day || '';
+    const todayData = pDaily.find(d => d.date === today);
+    const todayPnl = todayData ? todayData.pnl : 0;
+
+    const adxPct = p.adxR > 0 ? p.adx / p.adxR : 0;
+    const grid = Math.max(p.buyN||0, p.sellN||0);
+    const adxCol = adxPct >= 0.8 ? 'var(--red)' : adxPct >= 0.7 ? 'var(--amb)' : 'var(--grn)';
+
+    h += `<div class="pcard">
+      <div class="pcard-hdr">
+        <span class="pcard-name">${p.n}</span>
+        <span class="pill" style="background:${adxCol}22;color:${adxCol}">ADX ${p.adx.toFixed(0)}/${p.adxR}</span>
+      </div>
+      <div class="badge">
+        <span class="bdg" style="background:var(--sf2);color:var(--dim)">ATR ${p.atrR.toFixed(2)}x</span>
+        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Grid ${grid}</span>
+        <span class="bdg" style="background:var(--sf2);color:var(--dim)">Spd ${p.spd.toFixed(0)}</span>
+        ${p.fb ? '<span class="bdg" style="background:var(--red2);color:var(--red)">FLOAT BRK</span>' : ''}
+      </div>
+      <div class="mg mg3 mt4">
+        <div class="m"><div class="m-l">Float P&L</div><div class="m-v ${(p.floatPnl||0)>=0?'pos':'neg'}">$${(p.floatPnl||0).toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">Today</div><div class="m-v ${todayPnl>=0?'pos':'neg'}">$${todayPnl.toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">All Time</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
+      </div>
+      <div class="mg mg4 mt4">
+        <div class="m"><div class="m-l">Win%</div><div class="m-v">${winRate.toFixed(0)}%</div></div>
+        <div class="m"><div class="m-l">$/day</div><div class="m-v ${dailyRate>=0?'pos':'neg'}">${dailyRate.toFixed(2)}</div></div>
+        <div class="m"><div class="m-l">Blk Cost</div><div class="m-v">${blockCostRatio.toFixed(0)}%</div></div>
+        <div class="m"><div class="m-l">Trades</div><div class="m-v">${totalClosed}</div></div>
+      </div>
+      <div class="fxb dim mt4" style="font-size:9px">
+        <span>${daysActive} days active</span>
+        <span>Blk: ${totalBlkClosed} ($${totalBlkPnl.toFixed(2)})</span>
+      </div>
+    </div>`;
+  }
+
+  // Retired pairs
+  if (D.length > 0 && L.pairs) {
+    const activePairs = new Set(L.pairs.map(p => p.n));
+    const allPairs = new Set(D.map(d => d.pair));
+    const retired = [...allPairs].filter(p => !activePairs.has(p));
+    if (retired.length > 0) {
+      h += `<div class="card"><div class="card-t">Retired Pairs</div>`;
+      for (const rp of retired) {
+        const rpDaily = D.filter(d => d.pair === rp);
+        const rpPnl = rpDaily.reduce((s,d) => s + (d.pnl||0), 0);
+        const rpDays = new Set(rpDaily.map(d => d.date)).size;
+        h += `<div class="row"><span class="row-l">${rp} <span class="dim">(${rpDays}d)</span></span>
+          <span class="row-v ${rpPnl>=0?'pos':'neg'}">$${rpPnl.toFixed(2)}</span></div>`;
+      }
+      h += '</div>';
+    }
+  }
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// MANAGER tab
+// ============================================================
+function renderMgr() {
+  const el = document.getElementById('p-mgr');
+  if (!S.data || !S.data.latest) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const L = S.data.latest;
+  const tm = L.tm || {};
+  const D = S.data.daily || [];
+  let h = '';
+
+  // TM status
+  h += `<div class="card"><div class="card-t">Trade Manager</div>
+    <div class="mg mg2">
+      <div class="m"><div class="m-l">Status</div><div class="m-v" style="color:${tm.active?'var(--grn)':'var(--red)'}">${tm.active ? 'Online' : 'Offline'}</div></div>
+      <div class="m"><div class="m-l">Mode</div><div class="m-v" style="color:${tm.def?'var(--red)':'var(--grn)'}">${tm.def ? 'DEFENSIVE' : 'Normal'}</div></div>
+    </div>
+    <div class="mg mg4">
+      <div class="m"><div class="m-l">Allowed</div><div class="m-v pos">${tm.dayA||0}</div></div>
+      <div class="m"><div class="m-l">Blocked</div><div class="m-v neg">${tm.dayB||0}</div></div>
+      <div class="m"><div class="m-l">Cooldown</div><div class="m-v warn">${tm.dayC||0}</div></div>
+      <div class="m"><div class="m-l">Float Blk</div><div class="m-v">${tm.dayF||0}</div></div>
+    </div>
+  </div>`;
+
+  // TM config
+  h += `<div class="card"><div class="card-t">TM Config</div>
+    <div class="row"><span class="row-l">DD Soft Limit</span><span class="row-v">${tm.ddSoft||15}%</span></div>
+    <div class="row"><span class="row-l">Defensive DD</span><span class="row-v">${tm.defDD||10}%</span></div>
+    <div class="row"><span class="row-l">Max Trades</span><span class="row-v">${tm.maxT||50}</span></div>
+    <div class="row"><span class="row-l">Equity Floor</span><span class="row-v">$${L.acct.floor.toFixed(0)}</span></div>
+  </div>`;
+
+  // Strategy metrics
+  const pnl7d = calc7dPnl(D);
+  const rfVal = calcRF(D);
+  const streak = calcLossStreak(D);
+  const totalPnl = D.reduce((s,d) => s + (d.pnl||0), 0);
+  const totalDays = new Set(D.map(d => d.date)).size;
+
+  // Daily PF (approx)
+  const posDays = D.reduce((s,d) => { const byDate = {}; return s; }, 0);
+  let grossWinDays = 0, grossLossDays = 0;
+  const byDate = {};
+  for (const d of D) { byDate[d.date] = (byDate[d.date]||0) + (d.pnl||0); }
+  for (const dt of Object.keys(byDate)) {
+    if (byDate[dt] > 0) grossWinDays += byDate[dt];
+    else grossLossDays += Math.abs(byDate[dt]);
+  }
+  const dailyPF = grossLossDays > 0 ? grossWinDays / grossLossDays : (grossWinDays > 0 ? 99 : 0);
+
+  h += `<div class="card"><div class="card-t">Strategy Metrics</div>
+    <div class="mg mg3">
+      <div class="m"><div class="m-l">Total P&L</div><div class="m-v ${totalPnl>=0?'pos':'neg'}">$${totalPnl.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">7d P&L</div><div class="m-v ${pnl7d>=0?'pos':'neg'}">$${pnl7d.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">$/day avg</div><div class="m-v">${totalDays>0?(totalPnl/totalDays).toFixed(2):'--'}</div></div>
+    </div>
+    <div class="mg mg3">
+      <div class="m"><div class="m-l">Daily PF*</div><div class="m-v">${dailyPF>=99?'∞':dailyPF.toFixed(2)}</div></div>
+      <div class="m"><div class="m-l">RF</div><div class="m-v">${rfVal>=99?'∞':rfVal.toFixed(1)}</div></div>
+      <div class="m"><div class="m-l">Loss Streak</div><div class="m-v ${streak>=4?'neg':''}">${streak}d</div></div>
+    </div>
+    <div class="dim" style="font-size:8px;margin-top:4px">*Daily PF is approximate — uses daily net P&L, not trade-level gross win/loss</div>
+  </div>`;
+
+  // Per-pair ADX status
+  if (L.pairs) {
+    h += `<div class="card"><div class="card-t">ADX Status</div>`;
+    for (const p of L.pairs) {
+      const diMax = Math.max(p.diP||0, p.diM||0);
+      const trend = (p.diP||0) > (p.diM||0) ? 'UP' : 'DN';
+      const trendCol = trend === 'UP' ? 'var(--grn)' : 'var(--red)';
+      const pct = p.adxR > 0 ? (p.adx / p.adxR * 100) : 0;
+      h += `<div class="row"><div>
+        <span style="font-weight:600">${p.n}</span>
+        <span class="dim" style="font-size:9px;margin-left:4px">DI+ ${(p.diP||0).toFixed(0)} / DI- ${(p.diM||0).toFixed(0)}</span>
+      </div><div class="fx gap4" style="align-items:center">
+        <span style="color:${trendCol};font-weight:700;font-size:10px">${trend}</span>
+        <span class="row-v">${p.adx.toFixed(0)}<span class="dim">/${p.adxR}</span></span>
+        <span class="dim" style="font-size:9px">(${pct.toFixed(0)}%)</span>
+        ${p.brk ? '<span class="bdg" style="background:var(--amb2);color:var(--amb)">BRK</span>' : ''}
+      </div></div>`;
+    }
+    h += '</div>';
+  }
+
+  // Block cost ratio per pair
+  if (L.pairs && D.length > 0) {
+    h += `<div class="card"><div class="card-t">Block Cost Ratio</div>`;
+    for (const p of L.pairs) {
+      const pDaily = D.filter(d => d.pair === p.n);
+      const blkPnl = pDaily.reduce((s,d) => s + Math.abs(d.blkPnl||0), 0);
+      const grossPos = pDaily.reduce((s,d) => s + (d.pnl > 0 ? d.pnl : 0), 0);
+      const ratio = grossPos > 0 ? (blkPnl / grossPos * 100) : 0;
+      h += `<div class="row"><span class="row-l">${p.n}</span>
+        <span class="row-v ${ratio>20?'neg':ratio>10?'warn':''}">${ratio.toFixed(1)}%</span></div>`;
+    }
+    h += '<div class="dim" style="font-size:8px;margin-top:4px">|blocked P&L| ÷ gross positive P&L — lower is better</div></div>';
+  }
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// HISTORY tab
+// ============================================================
+function renderHist() {
+  const el = document.getElementById('p-hist');
+  if (!S.data) { el.innerHTML = '<div class="tac dim" style="padding:40px">No data</div>'; return; }
+  const D = S.data.daily || [];
+  const snaps = S.data.snapshots || [];
+  let h = '';
+
+  // Running total
+  const totalPnl = D.reduce((s,d) => s + (d.pnl||0), 0);
+  h += `<div class="card"><div class="fxb">
+    <div><div class="card-t" style="margin:0">Running Total</div></div>
+    <div class="m-v ${totalPnl>=0?'pos':'neg'}" style="font-size:20px">$${totalPnl.toFixed(2)}</div>
+  </div></div>`;
+
+  // Equity chart from snapshots
+  if (snaps.length > 2) {
+    h += `<div class="card"><div class="card-t">Equity (${snaps.length} snapshots)</div>
+      <div class="chart-wrap">${renderEquityChart(snaps)}</div></div>`;
+  }
+
+  // Daily P&L bars
+  const byDate = {};
+  for (const d of D) { byDate[d.date] = (byDate[d.date]||0) + (d.pnl||0); }
+  const dates = Object.keys(byDate).sort();
+
+  if (dates.length > 0) {
+    h += `<div class="card"><div class="card-t">Daily P&L</div>
+      <div class="chart-wrap">${renderDailyBars(dates, byDate)}</div></div>`;
+  }
+
+  // Daily table (collapsible)
+  if (dates.length > 0) {
+    h += `<div class="card"><div class="fxb"><div class="card-t" style="margin:0">Daily Table (${dates.length}d)</div>
+      <button class="coll-btn" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Hide':'Show'">Show</button></div>
+      <div class="coll-body">`;
+    for (const dt of [...dates].reverse()) {
+      const pnl = byDate[dt];
+      const dayPairs = D.filter(d => d.date === dt);
+      const wins = dayPairs.reduce((s,d) => s + (d.wins||0), 0);
+      const losses = dayPairs.reduce((s,d) => s + (d.losses||0), 0);
+      h += `<div class="row"><div>
+        <div style="font-size:10px;font-weight:600">${dt}</div>
+        <div class="dim" style="font-size:9px">${wins}W ${losses}L</div>
+      </div><div class="tar">
+        <div class="${pnl>=0?'pos':'neg'}" style="font-weight:600">$${pnl.toFixed(2)}</div>
+      </div></div>`;
+    }
+    h += '</div></div>';
+  }
+
+  el.innerHTML = h;
+}
+
+// ============================================================
+// Charts (SVG)
+// ============================================================
+function renderSparkline() {
+  if (!S.data || !S.data.snapshots || S.data.snapshots.length < 3) return '';
+  const snaps = S.data.snapshots.slice(-60); // last ~3 hours
+  const eqs = snaps.map(s => s.eq);
+  const min = Math.min(...eqs) * 0.999;
+  const max = Math.max(...eqs) * 1.001;
+  const w = 300, h = 30;
+  const pts = eqs.map((v, i) => {
+    const x = (i / (eqs.length - 1)) * w;
+    const y = h - ((v - min) / (max - min)) * h;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:30px;margin-top:6px">
+    <polyline points="${pts}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function renderEquityChart(snaps) {
+  const W = 340, H = 120, P = 25;
+  const bals = snaps.map(s => s.bal);
+  const eqs = snaps.map(s => s.eq);
+  const all = [...bals, ...eqs];
+  const min = Math.min(...all) * 0.998;
+  const max = Math.max(...all) * 1.002;
+  const range = max - min || 1;
+
+  function pts(arr) {
+    return arr.map((v, i) => {
+      const x = P + (i / (arr.length - 1)) * (W - P * 2);
+      const y = P / 2 + (1 - (v - min) / range) * (H - P);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+  }
+
+  // Y-axis labels
+  const steps = 4;
+  let labels = '';
+  for (let i = 0; i <= steps; i++) {
+    const val = min + (range * i / steps);
+    const y = P / 2 + (1 - i / steps) * (H - P);
+    labels += `<text x="${P-4}" y="${y+3}" fill="var(--mt)" font-size="8" text-anchor="end">$${val.toFixed(0)}</text>`;
+    labels += `<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="var(--bd)" stroke-width="0.5"/>`;
+  }
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:120px">
+    ${labels}
+    <polyline points="${pts(bals)}" fill="none" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3,2"/>
+    <polyline points="${pts(eqs)}" fill="none" stroke="var(--blu)" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>
+  <div class="fxb dim" style="font-size:8px"><span>— Balance</span><span style="color:var(--blu)">— Equity</span></div>`;
+}
+
+function renderDailyBars(dates, byDate) {
+  const W = 340, H = 100, P = 25;
+  const vals = dates.map(d => byDate[d]);
+  const maxAbs = Math.max(1, ...vals.map(Math.abs));
+  const barW = Math.max(2, Math.min(12, (W - P * 2) / dates.length - 1));
+  const mid = H / 2;
+
+  let bars = '';
+  for (let i = 0; i < dates.length; i++) {
+    const v = vals[i];
+    const x = P + (i / dates.length) * (W - P * 2);
+    const barH = Math.abs(v) / maxAbs * (H / 2 - 5);
+    const y = v >= 0 ? mid - barH : mid;
+    const col = v >= 0 ? 'var(--grn)' : 'var(--red)';
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${Math.max(1,barH).toFixed(1)}" fill="${col}" rx="1"/>`;
+  }
+
+  // Zero line
+  const labels = `<line x1="${P}" y1="${mid}" x2="${W-P}" y2="${mid}" stroke="var(--mt)" stroke-width="0.5"/>
+    <text x="${P-4}" y="${mid+3}" fill="var(--mt)" font-size="8" text-anchor="end">$0</text>
+    <text x="${P-4}" y="12" fill="var(--mt)" font-size="8" text-anchor="end">+$${maxAbs.toFixed(0)}</text>
+    <text x="${P-4}" y="${H-2}" fill="var(--mt)" font-size="8" text-anchor="end">-$${maxAbs.toFixed(0)}</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100px">${labels}${bars}</svg>`;
+}
+
+// ============================================================
+// Settings (disconnect)
+// ============================================================
+function disconnect() {
+  localStorage.removeItem('tm_url');
+  S.url = '';
+  S.data = null;
+  clearTimeout(S.timer);
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('connectScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
